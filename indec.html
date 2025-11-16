@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ChemoDose App</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a6cf7">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <style>
+        body {
+            font-family: "Prompt", sans-serif;
+            margin: 0;
+            background: #f1f3ff;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: auto;
+            background: white;
+            min-height: 100vh;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            text-align: center;
+            color: #4a6cf7;
+            font-size: 1.8rem;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            margin-top: 6px;
+            border-radius: 12px;
+            border: 1px solid #cdd5ff;
+            font-size: 1.1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 25px;
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        button:active {
+            background: #2e48d8;
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 18px;
+            border-radius: 12px;
+            background: #eef3ff;
+            font-size: 1.1rem;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 12px;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #4a6cf7;
+            color: white;
+            padding: 8px;
+            font-size: 1rem;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #e0e4ff;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h2>ChemoDose Calculator</h2>
+
+    <label>ส่วนสูง (cm)</label>
+    <input type="number" id="height" value="170" oninput="calculate()">
+
+    <label>น้ำหนัก (kg)</label>
+    <input type="number" id="weight" value="70" oninput="calculate()">
+
+    <label>สูตรยา (Regimen)</label>
+    <select id="protocol" onchange="calculate()">
+        <option value="">เลือกสูตรยา</option>
+        <option value="mFOLFOX">mFOLFOX-6</option>
+        <option value="mFOLFIRI">mFOLFIRI</option>
+        <option value="ABVD">ABVD</option>
+    </select>
+
+    <label>ลดโดส (%)</label>
+    <select id="reduce" onchange="calculate()">
+        <option value="1">0% (ไม่ลด)</option>
+        <option value="0.95">5%</option>
+        <option value="0.9">10%</option>
+        <option value="0.85">15%</option>
+        <option value="0.8">20%</option>
+        <option value="0.75">25%</option>
+        <option value="0.7">30%</option>
+    </select>
+
+    <button onclick="calculate()">คำนวณ</button>
+
+    <div class="result-box" id="result">ผลลัพธ์จะอยู่ที่นี่</div>
+</div>
+
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+}
+
+const REGIMEN = {
+    "mFOLFOX": [
+        { name: "Oxaliplatin", dose: 85 },
+        { name: "Leucovorin", dose: 200 },
+        { name: "5-FU Bolus", dose: 400 },
+        { name: "5-FU Infusion", dose: 1200 }
+    ],
+    "mFOLFIRI": [
+        { name: "Irinotecan", dose: 180 },
+        { name: "Leucovorin", dose: 200 },
+        { name: "5-FU Bolus", dose: 400 },
+        { name: "5-FU Infusion", dose: 1200 }
+    ],
+    "ABVD": [
+        { name: "Doxorubicin", dose: 25 },
+        { name: "Bleomycin", dose: 10 },
+        { name: "Vinblastine", dose: 6 },
+        { name: "Dacarbazine", dose: 375 }
+    ]
+};
+
+function BSA(h, w) {
+    return Math.sqrt((h * w) / 3600);
+}
+
+function calculate() {
+    let h = parseFloat(document.getElementById("height").value);
+    let w = parseFloat(document.getElementById("weight").value);
+    let p = document.getElementById("protocol").value;
+    let r = parseFloat(document.getElementById("reduce").value);
+
+    if (!h || !w || !p) {
+        document.getElementById("result").innerHTML = "กรอกข้อมูลให้ครบก่อน";
+        return;
+    }
+
+    let bsa = BSA(h, w).toFixed(2);
+    let reducPercent = (100 - r * 100);
+
+    let html = `<b>BSA = ${bsa} m²</b><br>ลดโดส: ${reducPercent}%`;
+
+    html += `<table>
+        <tr><th>ยา</th><th>mg/m²</th><th>รวม (mg)</th></tr>
+    `;
+
+    REGIMEN[p].forEach(d => {
+        let total = d.dose * bsa * r;
+        html += `
+        <tr>
+            <td>${d.name}</td>
+            <td>${d.dose}</td>
+            <td>${total.toFixed(1)}</td>
+        </tr>`;
+    });
+
+    html += "</table>";
+
+    document.getElementById("result").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
