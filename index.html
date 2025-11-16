@@ -2,196 +2,457 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ChemoDose App</title>
-
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#4a6cf7">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
-
+    <meta name="description" content="เครื่องคำนวณขนาดยาเคมีบำบัดตามพื้นที่ผิวร่างกาย (BSA)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Chemo Calculator">
+    <title>เครื่องคำนวณยาเคมีบำบัด</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --primary: #4a6cf7;
+            --primary-dark: #2f4ed8;
+            --bg: #f5f7ff;
+            --card-bg: #ffffff;
+            --border: #d9e1ff;
+            --text-dark: #2e2e3a;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             font-family: "Prompt", sans-serif;
+            background: var(--bg);
             margin: 0;
-            background: #f1f3ff;
-        }
-
-        .app-container {
-            max-width: 480px;
-            margin: auto;
-            background: white;
+            padding: 0;
             min-height: 100vh;
-            padding: 20px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
         }
 
-        h2 {
+        .app-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px 15px;
             text-align: center;
-            color: #4a6cf7;
-            font-size: 1.8rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .app-header .subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .calculator-container {
+            flex: 1;
+            padding: 20px 15px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
         }
 
         label {
             display: block;
-            margin-top: 15px;
             font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
         }
 
         input, select {
             width: 100%;
             padding: 14px;
-            margin-top: 6px;
+            border: 2px solid var(--border);
             border-radius: 12px;
-            border: 1px solid #cdd5ff;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            font-family: "Prompt", sans-serif;
+            transition: all 0.3s ease;
+            background: white;
         }
 
-        button {
-            width: 100%;
-            padding: 16px;
-            margin-top: 25px;
-            background: #4a6cf7;
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .bsa-result {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
             color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 1.3rem;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .bsa-label {
+            font-size: 0.9rem;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+
+        .bsa-value {
+            font-size: 2rem;
             font-weight: 700;
         }
 
-        button:active {
-            background: #2e48d8;
+        .calculate-button {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: "Prompt", sans-serif;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .calculate-button:active {
+            transform: scale(0.98);
         }
 
         .result-box {
-            margin-top: 25px;
-            padding: 18px;
-            border-radius: 12px;
-            background: #eef3ff;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .result-header {
+            font-weight: 700;
+            color: var(--primary-dark);
             font-size: 1.1rem;
-        }
-
-        table {
-            width: 100%;
-            margin-top: 12px;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #4a6cf7;
-            color: white;
-            padding: 8px;
-            font-size: 1rem;
-        }
-
-        td {
-            padding: 8px;
-            border-bottom: 1px solid #e0e4ff;
-            font-size: 1rem;
+            margin-bottom: 15px;
             text-align: center;
         }
 
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .result-table table {
+            width: 100%;
+            min-width: 100%;
+        }
+
+        .result-table th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .result-table td {
+            border-bottom: 1px solid #e5e7ff;
+            padding: 12px 8px;
+            text-align: center;
+        }
+
+        .result-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .placeholder-text {
+            text-align: center;
+            color: #999;
+            padding: 30px 20px;
+            font-size: 0.95rem;
+        }
+
+        .visitor-counter {
+            text-align: center;
+            padding: 15px;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #bfc4d9;
+            font-size: 0.8rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card, .result-box {
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Loading state */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 360px) {
+            .app-header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .result-table th,
+            .result-table td {
+                padding: 10px 6px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .calculator-container {
+                padding: 30px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <h2>ChemoDose Calculator</h2>
+<div class="app-header">
+    <h1>🧪 เครื่องคำนวณยาเคมีบำบัด</h1>
+    <div class="subtitle">Chemotherapy Dose Calculator</div>
+</div>
 
-    <label>ส่วนสูง (cm)</label>
-    <input type="number" id="height" value="170" oninput="calculate()">
+<div class="calculator-container">
+    <div class="card">
+        <div class="input-group">
+            <label>📏 ส่วนสูง (cm)</label>
+            <input type="number" id="height" value="170" min="1" max="250" 
+                   oninput="calculateChemoDose()" placeholder="กรอกส่วนสูง">
+        </div>
 
-    <label>น้ำหนัก (kg)</label>
-    <input type="number" id="weight" value="70" oninput="calculate()">
+        <div class="input-group">
+            <label>⚖️ น้ำหนัก (kg)</label>
+            <input type="number" id="weight" value="70" min="1" max="300" 
+                   oninput="calculateChemoDose()" placeholder="กรอกน้ำหนัก">
+        </div>
 
-    <label>สูตรยา (Regimen)</label>
-    <select id="protocol" onchange="calculate()">
-        <option value="">เลือกสูตรยา</option>
-        <option value="mFOLFOX">mFOLFOX-6</option>
-        <option value="mFOLFIRI">mFOLFIRI</option>
-        <option value="ABVD">ABVD</option>
-    </select>
+        <div class="bsa-result">
+            <div class="bsa-label">พื้นที่ผิวร่างกาย (BSA)</div>
+            <div class="bsa-value" id="resultBSA">0.00 m²</div>
+        </div>
+    </div>
 
-    <label>ลดโดส (%)</label>
-    <select id="reduce" onchange="calculate()">
-        <option value="1">0% (ไม่ลด)</option>
-        <option value="0.95">5%</option>
-        <option value="0.9">10%</option>
-        <option value="0.85">15%</option>
-        <option value="0.8">20%</option>
-        <option value="0.75">25%</option>
-        <option value="0.7">30%</option>
-    </select>
+    <div class="card">
+        <div class="input-group">
+            <label>💊 สูตรยา (Regimen)</label>
+            <select id="drugProtocol" onchange="calculateChemoDose()">
+                <option value="">-- กรุณาเลือกสูตรยา --</option>
+                <option value="mFOLFOX-6">mFOLFOX-6</option>
+                <option value="mFOLFIRI">mFOLFIRI</option>
+                <option value="ABVD">ABVD Regimen</option>
+            </select>
+        </div>
 
-    <button onclick="calculate()">คำนวณ</button>
+        <div class="input-group">
+            <label>📉 ปรับลดขนาดยา (Dose Reduction)</label>
+            <select id="doseReduction" onchange="calculateChemoDose()">
+                <option value="1">ไม่ลดโดส (0%)</option>
+                <option value="0.95">ลดโดส 5%</option>
+                <option value="0.90">ลดโดส 10%</option>
+                <option value="0.85">ลดโดส 15%</option>
+                <option value="0.80">ลดโดส 20%</option>
+                <option value="0.75">ลดโดส 25%</option>
+                <option value="0.70">ลดโดส 30%</option>
+            </select>
+        </div>
 
-    <div class="result-box" id="result">ผลลัพธ์จะอยู่ที่นี่</div>
+        <button class="calculate-button" onclick="calculateChemoDose()">
+            🧮 คำนวณขนาดยา
+        </button>
+    </div>
+
+    <div class="result-box">
+        <div class="result-header">📊 สรุปขนาดยาที่ต้องให้</div>
+        <div class="result-table" id="resultMultiDose">
+            <div class="placeholder-text">
+                โปรดเลือกสูตรยาและกรอกข้อมูลผู้ป่วย
+            </div>
+        </div>
+    </div>
+
+    <div class="visitor-counter">
+        👥 จำนวนผู้เข้าชม: <strong><span id="visitorCount">0</span></strong> ครั้ง
+    </div>
+</div>
+
+<div class="footer">
+    Developed by witsao-oya<br>
+    Mobile Version 2.0
 </div>
 
 <script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-}
-
-const REGIMEN = {
-    "mFOLFOX": [
-        { name: "Oxaliplatin", dose: 85 },
-        { name: "Leucovorin", dose: 200 },
-        { name: "5-FU Bolus", dose: 400 },
-        { name: "5-FU Infusion", dose: 1200 }
+const CHEMO_REGIMENS = {
+    'mFOLFOX-6': [
+        { name: 'Oxaliplatin', dose_m2: 85 },
+        { name: 'Leucovorin', dose_m2: 200 },
+        { name: '5-FU Bolus', dose_m2: 400 },
+        { name: '5-FU Infusion', dose_m2: 1200 }
     ],
-    "mFOLFIRI": [
-        { name: "Irinotecan", dose: 180 },
-        { name: "Leucovorin", dose: 200 },
-        { name: "5-FU Bolus", dose: 400 },
-        { name: "5-FU Infusion", dose: 1200 }
+    'mFOLFIRI': [
+        { name: 'Irinotecan', dose_m2: 180 },
+        { name: 'Leucovorin', dose_m2: 200 },
+        { name: '5-FU Bolus', dose_m2: 400 },
+        { name: '5-FU Infusion', dose_m2: 1200 }
     ],
-    "ABVD": [
-        { name: "Doxorubicin", dose: 25 },
-        { name: "Bleomycin", dose: 10 },
-        { name: "Vinblastine", dose: 6 },
-        { name: "Dacarbazine", dose: 375 }
+    'ABVD': [
+        { name: 'Doxorubicin', dose_m2: 25, max_dose: 40 },
+        { name: 'Bleomycin', dose_m2: 10 },
+        { name: 'Vinblastine', dose_m2: 6, max_dose: 15 },
+        { name: 'Dacarbazine', dose_m2: 375 }
     ]
 };
 
-function BSA(h, w) {
+function calculateBSA(h, w) {
     return Math.sqrt((h * w) / 3600);
 }
 
-function calculate() {
-    let h = parseFloat(document.getElementById("height").value);
-    let w = parseFloat(document.getElementById("weight").value);
-    let p = document.getElementById("protocol").value;
-    let r = parseFloat(document.getElementById("reduce").value);
+function calculateChemoDose() {
+    let h = parseFloat(document.getElementById("height").value) || 0;
+    let w = parseFloat(document.getElementById("weight").value) || 0;
+    let protocol = document.getElementById("drugProtocol").value;
+    let reduction = parseFloat(document.getElementById("doseReduction").value);
 
-    if (!h || !w || !p) {
-        document.getElementById("result").innerHTML = "กรอกข้อมูลให้ครบก่อน";
+    if (!h || !w || h <= 0 || w <= 0) {
+        document.getElementById("resultBSA").innerText = "0.00 m²";
+        document.getElementById("resultMultiDose").innerHTML = 
+            '<div class="placeholder-text">กรุณากรอกข้อมูลส่วนสูงและน้ำหนัก</div>';
         return;
     }
 
-    let bsa = BSA(h, w).toFixed(2);
-    let reducPercent = (100 - r * 100);
+    let bsa = calculateBSA(h, w);
+    document.getElementById("resultBSA").innerText = bsa.toFixed(2) + " m²";
 
-    let html = `<b>BSA = ${bsa} m²</b><br>ลดโดส: ${reducPercent}%`;
+    if (!protocol) {
+        document.getElementById("resultMultiDose").innerHTML = 
+            '<div class="placeholder-text">โปรดเลือกสูตรยา</div>';
+        return;
+    }
 
-    html += `<table>
-        <tr><th>ยา</th><th>mg/m²</th><th>รวม (mg)</th></tr>
-    `;
+    let reducPercent = ((1 - reduction) * 100).toFixed(0);
 
-    REGIMEN[p].forEach(d => {
-        let total = d.dose * bsa * r;
-        html += `
-        <tr>
-            <td>${d.name}</td>
-            <td>${d.dose}</td>
-            <td>${total.toFixed(1)}</td>
+    let drugs = CHEMO_REGIMENS[protocol];
+    let html = `<table>
+        <thead>
+            <tr>
+                <th>ยา</th>
+                <th>mg/m²</th>
+                <th>ต้องให้ (mg)</th>
+                <th>ลด %</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+    drugs.forEach(drug => {
+        let dose = drug.dose_m2 * bsa * reduction;
+        if (drug.max_dose && dose > drug.max_dose) {
+            dose = drug.max_dose;
+        }
+        html += `<tr>
+            <td style="font-weight:600;">${drug.name}</td>
+            <td>${drug.dose_m2}</td>
+            <td style="color:var(--primary); font-weight:700;">${dose.toFixed(1)}</td>
+            <td>${reducPercent}%</td>
         </tr>`;
     });
 
-    html += "</table>";
-
-    document.getElementById("result").innerHTML = html;
+    html += "</tbody></table>";
+    document.getElementById("resultMultiDose").innerHTML = html;
 }
+
+function updateVisitorCount() {
+    let count = localStorage.getItem('visitorCount');
+    if (count === null) {
+        count = 0;
+    } else {
+        count = parseInt(count);
+    }
+    count++;
+    localStorage.setItem('visitorCount', count);
+    document.getElementById("visitorCount").innerText = count.toLocaleString('th-TH');
+}
+
+// Initialize on page load
+window.onload = function() {
+    updateVisitorCount();
+    calculateChemoDose();
+}
+
+// Add touch feedback
+document.addEventListener('DOMContentLoaded', function() {
+    const button = document.querySelector('.calculate-button');
+    if (button) {
+        button.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.98)';
+        });
+        button.addEventListener('touchend', function() {
+            this.style.transform = 'scale(1)';
+        });
+    }
+});
 </script>
 
 </body>
