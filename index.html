@@ -687,7 +687,27 @@ function calculateChemoDose() {
             finalDose = rawDose * reduction;
             stdDisplay = `${doseM2}`;
         }
+// --- เริ่มส่วนคำนวณ Capecitabine (XELOX) ---
+    
+    // 1. คำนวณจำนวนเม็ดต่อวัน (ปัดเศษลง)
+    // หมายเหตุ: ต้องใช้ตัวแปร bsa ของพี่ตรงนี้ ถ้าพี่ตั้งชื่ออื่น ให้แก้คำว่า bsa เป็นชื่อนั้นครับ
+    var capecitabine_total_mg = bsa * 2000; 
+    var capecitabine_daily_tab = Math.floor(capecitabine_total_mg / 500);
 
+    // 2. แบ่งมื้อ (เช้า - เย็น)
+    var dose_evening = Math.floor(capecitabine_daily_tab / 2);
+    var dose_morning = capecitabine_daily_tab - dose_evening;
+
+    // 3. คำนวณยอดรวมทั้งคอร์ส (14 วัน)
+    var total_cycle_tab = capecitabine_daily_tab * 14;
+
+    // 4. สร้างข้อความผลลัพธ์ (เช่น 3-0-2 / 70 tab)
+    var result_text = dose_morning + "-0-" + dose_evening + " / " + total_cycle_tab + " tab";
+
+    // 5. เอาค่าไปแสดงผล (แก้ 'your_input_id' เป็น id ช่องที่พี่ต้องการแสดงผล)
+    // document.getElementById('your_input_id').value = result_text; 
+    
+    // --- จบส่วนคำนวณ Capecitabine ---
         // เช็ค Max Dose
         if (drug.max_dose && finalDose > drug.max_dose) { finalDose = drug.max_dose; }
         
