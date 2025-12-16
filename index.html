@@ -448,7 +448,7 @@ const DEFAULT_REGIMENS = {
         { name: 'Leucovorin', dose_m2: 20 }, 
         { name: '5-FU Bolus', dose_m2: 375 }, 
         { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Bolus', dose_m2: 425 }, 
+        { name: '5-FU Bolus', dose_m2: 425 } 
     ],
     'Carboplatin + Etoposide': [
         { name: 'Etoposide', dose_m2: 100 },
@@ -461,7 +461,7 @@ const DEFAULT_REGIMENS = {
     'Cisplatin + 5-Fu': [
         { name: '5-FU', dose_m2: 1000 },
         { name: 'Cisplatin', dose_m2: 75 },
-        { name: 'Cisplatin', dose_m2: 100 },
+        { name: 'Cisplatin', dose_m2: 100 }
     ],
     'XELOX': [
     { 
@@ -499,9 +499,26 @@ const DEFAULT_REGIMENS = {
         { name: 'Paclitaxel', dose_m2: 225 },
         { name: 'Mesna', dose_m2: 300 },
         { name: 'Ifosfamide', dose_m2: 1500 },
-        { name: 'Cisplatin', dose_m2: 25 },
+        { name: 'Cisplatin', dose_m2: 25 }
     ],
-    
+    'Ifosfamide+Etoposide': [
+        { name: 'Mesna', dose_m2: 300 },
+        { name: 'Ifosfamide', dose_m2: 1500 },
+        { name: 'Etoposide', dose_m2: 80 }
+    ],
+    'BEP': [
+        { name: 'Cisplatin', dose_m2: 20 },
+        { name: 'Carboplatin', type: 'auc', target_auc: 6 }
+         { name: 'Etoposide', dose_m2: 80 },
+        { name: 'Bleomycin', dose_m2:  }
+    ],
+     'VIP': [
+        { name: 'Cisplatin', dose_m2: 20 },
+        { name: 'Carboplatin', type: 'auc', target_auc: 5 }
+         { name: 'Etoposide', dose_m2: 75 },
+        { name: 'Mesna', dose_m2: 300 },
+        { name: 'Ifosfamide', dose_m2: 1200 }
+    ],        
     // --- กลุ่มมะเร็งต่อมน้ำเหลือง (Lymphoma) ---
     'R-CHOP': [
         { name: 'Rituximab', dose_m2: 375 },
