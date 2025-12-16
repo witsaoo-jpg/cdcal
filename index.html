@@ -508,18 +508,18 @@ const DEFAULT_REGIMENS = {
     ],
     'BEP': [
         { name: 'Cisplatin', dose_m2: 20 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 6 }, // ใส่ลูกน้ำคั่น
+        { name: 'Carboplatin', type: 'auc', target_auc: 6 }, 
         { name: 'Etoposide', dose_m2: 80 },
         { 
             name: 'Bleomycin', 
-            type: 'fixed',    // บอกระบบว่าเป็นยา Fixed Dose
-            dose_fixed: 30,   // ใส่เลข 30 ตรงนี้ (Fixed Value)
+            type: 'fixed', 
+            dose_fixed: 30, 
             note: '(Max 30 mg)' 
         }
     ],
     'VIP': [
         { name: 'Cisplatin', dose_m2: 20 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 }, // ใส่ลูกน้ำคั่น
+        { name: 'Carboplatin', type: 'auc', target_auc: 5 }, 
         { name: 'Etoposide', dose_m2: 75 },
         { name: 'Mesna', dose_m2: 300 },
         { name: 'Ifosfamide', dose_m2: 1200 }
@@ -702,31 +702,47 @@ function calculateChemoDose() {
 
     let html = `<table style="width:100%"><thead><tr><th>DRUG</th><th>STD/Target</th><th>DOSE (mg)</th><th>-%</th></tr></thead><tbody>`;
     
-drugs.forEach(drug => {
+    drugs.forEach(drug => {
         let finalDose = 0; 
         let stdDisplay = '-'; 
         let note = drug.note || ''; 
         let doseDisplayHtml = ''; 
         
         if (drug.type === 'capecitabine_special') {
-            // === Capecitabine ===
+            // === LOGIC คำนวณ Capecitabine (สูตรหารเม็ด) ===
             stdDisplay = `${drug.dose_m2}`;
-            let totalMg = (bsa * drug.dose_m2) * reduction;
-            let dailyTablets = Math.floor(totalMg / 500);
+            
+            // 1. คำนวณ mg รวมต่อวัน
+            let totalMg = bsa * drug.dose_m2;
+            
+            // 2. ปรับลด Dose (คิด mg ก่อน)
+            totalMg = totalMg * reduction;
+
+            // 3. แปลงเป็นเม็ด (หาร 500) แล้วปัดลง
+            let rawTablets = totalMg / 500;
+            let dailyTablets = Math.floor(rawTablets);
+
+            // 4. แบ่งมื้อ (เช้า - เย็น)
+            // สูตร: หาร 2 ปัดลงเป็นเย็น ที่เหลือเป็นเช้า (ถ้าคี่ เช้าจะมากกว่า 1)
             let eveningDose = Math.floor(dailyTablets / 2);
             let morningDose = dailyTablets - eveningDose;
+
+            // 5. รวมทั้งคอร์ส 14 วัน
             let totalCycleTablets = dailyTablets * 14;
+
+            // 6. สร้างข้อความแสดงผล
+            // แสดงผลเป็น: 3-0-2 (รวม 70 tab)
             doseDisplayHtml = `<span style="font-size:0.9em">${morningDose}-0-${eveningDose} <br><span style="font-size:0.75em; opacity:0.7">(${totalCycleTablets} tab)</span></span>`;
 
         } else if (drug.type === 'fixed') {
             // === NEW: Fixed Dose (Bleomycin 30mg) ===
-            let rawDose = drug.dose_fixed;
+            let rawDose = drug.dose_fixed || 0;
             finalDose = rawDose * reduction;
             stdDisplay = `${rawDose} mg`;
             doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
 
         } else if (drug.type === 'auc') {
-            // === AUC ===
+            // === คำนวณแบบ AUC ===
             let target = userTargetAUC; 
             if(gfr > 0) {
                 let cappedGFR = (gfr > 125) ? 125 : gfr;
@@ -740,18 +756,20 @@ drugs.forEach(drug => {
             doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
 
         } else if (drug.type === 'weight') {
-            // === mg/kg ===
+            // --- คำนวณแบบ mg/kg ---
             let rawDose = (drug.dose_kg || 0) * w;
             finalDose = rawDose * reduction;
             stdDisplay = `${drug.dose_kg} mg/kg`;
             doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
 
         } else {
-            // === BSA ปกติ ===
+            // --- คำนวณแบบ BSA ปกติ ---
             let doseM2 = drug.dose_m2 || 0;
             let rawDose = doseM2 * bsa;
             finalDose = rawDose * reduction;
             stdDisplay = `${doseM2}`;
+            
+            // เช็ค Max Dose
             if (drug.max_dose && finalDose > drug.max_dose) { finalDose = drug.max_dose; }
             doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
         }
