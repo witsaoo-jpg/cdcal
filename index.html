@@ -510,7 +510,12 @@ const DEFAULT_REGIMENS = {
         { name: 'Cisplatin', dose_m2: 20 },
         { name: 'Carboplatin', type: 'auc', target_auc: 6 }, // ใส่ลูกน้ำคั่น
         { name: 'Etoposide', dose_m2: 80 },
-        { name: 'Bleomycin', dose_m2: 30 } // ใส่เลข 30 ให้ก่อน (แก้ได้)
+        { 
+            name: 'Bleomycin', 
+            type: 'fixed',    // บอกระบบว่าเป็นยา Fixed Dose
+            dose_fixed: 30,   // ใส่เลข 30 ตรงนี้ (Fixed Value)
+            note: '(Max 30 mg)' 
+        }
     ],
     'VIP': [
         { name: 'Cisplatin', dose_m2: 20 },
@@ -757,7 +762,17 @@ function calculateChemoDose() {
             if (drug.max_dose && finalDose > drug.max_dose) { finalDose = drug.max_dose; }
             doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
         }
-        
+        } else if (drug.type === 'fixed') {
+            // === คำนวณแบบ Fixed Dose (ปริมาณคงที่) ===
+            let rawDose = drug.dose_fixed;
+            
+            // ยังคงคำนวณ % ลด Dose ตามที่เลือกใน Dropdown
+            finalDose = rawDose * reduction;
+            
+            stdDisplay = `${rawDose} mg`; // แสดงในช่องกลางว่า 30 mg
+            doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
+
+        }
         html += `<tr><td>${drug.name}<br><span style="font-size:0.75em; color:var(--text-muted)">${note}</span></td><td style="color:#94a3b8">${stdDisplay}</td><td class="dose-value">${doseDisplayHtml}</td><td style="color:#ec4899">${reducPercent}%</td></tr>`;
     });
     
