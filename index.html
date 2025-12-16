@@ -73,14 +73,8 @@
         
         .app-header .subtitle { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; margin-top: 5px; text-transform: uppercase; }
 
-        .settings-btn {
-            position: absolute; top: 50%; right: 20px;
-            transform: translateY(-50%); font-size: 1.5rem;
-            cursor: pointer; color: var(--neon-blue);
-            text-shadow: 0 0 10px var(--neon-blue);
-            transition: all 0.3s ease;
-            margin-top: calc(env(safe-area-inset-top) / 2);
-        }
+        /* ลบ CSS ของปุ่มตั้งค่าออก */
+        /* .settings-btn { ... } */ 
 
         .calculator-container {
             flex: 1; padding: 30px 20px;
@@ -194,9 +188,9 @@
 
         #installBtn { display: none; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--neon-blue); color: var(--neon-blue); }
 
-        /* Style for Backup/Restore */
-        .btn-backup { background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; }
-        .btn-restore { background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #4ade80; }
+        /* ลบ Style สำหรับ Backup/Restore */
+        /* .btn-backup { ... } */
+        /* .btn-restore { ... } */
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .card, .result-box { animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
@@ -205,7 +199,6 @@
 <body>
 
 <div class="app-header">
-    <div class="settings-btn" onclick="openAdminAuthModal()">⚙️</div>
     <h1>🧪เครื่องคำนวณยาเคมีบำบัด<span style="font-weight:300"></span></h1>
     <div class="subtitle">Chemotherapy Dose Calculator</div>
 </div>
@@ -301,89 +294,8 @@
     </div>
 </div>
 
-<div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">🔐 ACCESS RESTRICTED</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <input type="password" id="adminPasswordInput" class="form-control text-center" placeholder="ENTER PIN CODE" style="letter-spacing: 5px; font-size: 1.5rem;">
-          <div id="authError" class="text-danger small text-center mt-2" style="display:none;">ACCESS DENIED</div>
-        </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-info w-100 fw-bold" onclick="verifyAdmin()">AUTHENTICATE</button>
-        </div>
-      </div>
-    </div>
-</div>
-  
-<div class="modal fade" id="addRegimenModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title text-info">⚙️ SYSTEM DATABASE</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            
-            <div class="mb-3 p-3 border rounded" style="background: rgba(0,0,0,0.2);">
-                <label class="text-muted small mb-2 text-uppercase fw-bold">📲 Transfer Data (Backup/Restore)</label>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-backup w-50" onclick="backupData()">📥 BACKUP</button>
-                    <button class="btn btn-sm btn-restore w-50" onclick="document.getElementById('restoreFile').click()">📤 RESTORE</button>
-                    <input type="file" id="restoreFile" accept=".json" style="display: none;" onchange="restoreData(this)">
-                </div>
-            </div>
-
-            <hr class="bg-secondary">
-
-            <h6 class="text-light fw-bold">➕ ADD NEW PROTOCOL</h6>
-            <div class="mb-3"><input type="text" class="form-control" id="newRegimenName" placeholder="PROTOCOL NAME"></div>
-            
-            <div class="p-3 mb-3 border rounded" style="background: rgba(255,255,255,0.05);">
-                <label class="text-muted small mb-2">ADD DRUG TO LIST:</label>
-                <div class="row g-1 align-items-center">
-                    <div class="col-5">
-                        <input type="text" class="form-control form-control-sm" id="newDrugName" placeholder="Name">
-                    </div>
-                    <div class="col-2">
-                        <input type="number" class="form-control form-control-sm" id="newDrugDose" placeholder="Val">
-                    </div>
-                    <div class="col-3">
-                        <select class="form-select form-select-sm" id="newDrugType" style="font-size:0.7rem;">
-                            <option value="bsa">mg/m²</option>
-                            <option value="auc">AUC</option>
-                        </select>
-                    </div>
-                    <div class="col-2">
-                        <button class="btn btn-sm btn-success w-100" onclick="addNewDrugToList()">+</button>
-                    </div>
-                </div>
-                <div class="text-muted small mt-1" style="font-size:0.65rem;">*Auto-fill: AUC default = 5</div>
-            </div>
-
-            <div class="mb-3">
-                <div class="temp-drug-list border rounded p-2" style="min-height: 50px; background: rgba(0,0,0,0.2);">
-                    <ul id="tempDrugUl" class="list-group list-group-flush bg-transparent small"><li class="text-muted text-center list-group-item bg-transparent">- NO DATA -</li></ul>
-                </div>
-                <button type="button" class="btn btn-outline-info w-100 mt-2" onclick="saveNewRegimenToStorage()">💾 SAVE TO DATABASE</button>
-            </div>
-            
-            <hr class="bg-secondary">
-            
-            <h6 class="text-danger fw-bold">🗑️ REMOVE PROTOCOL</h6>
-            <div class="border rounded p-2" style="background: rgba(0,0,0,0.2);">
-                <ul id="savedRegimensList" class="list-group list-group-flush small bg-transparent"></ul>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-
 <script>
-// PWA Logic
+// PWA Logic (เหมือนเดิม)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
@@ -533,132 +445,56 @@ const DEFAULT_REGIMENS = {
     ]
 };
 
-let activeRegimens = {}; let tempNewDrugsList = [];
+let activeRegimens = {}; 
+// ลบ: let tempNewDrugsList = [];
 
 function loadAllRegimens() {
-    const customRegimens = JSON.parse(localStorage.getItem('customChemoRegimens')) || {};
+    // ลบการโหลด customRegimens จาก Local Storage เพราะไม่มีหน้า Admin ให้เพิ่มแล้ว
+    const customRegimens = {}; // เปลี่ยนเป็น Object เปล่า
     activeRegimens = { ...DEFAULT_REGIMENS, ...customRegimens };
     const select = document.getElementById('drugProtocol');
     const currentSelection = select.value;
     select.innerHTML = '<option value="">-- SELECT REGIMEN --</option>';
-    Object.keys(DEFAULT_REGIMENS).forEach(key => { const option = document.createElement('option'); option.value = key; option.textContent = key; select.appendChild(option); });
+    
+    // โหลดเฉพาะ Default Regimens เท่านั้น
+    Object.keys(DEFAULT_REGIMENS).forEach(key => { 
+        const option = document.createElement('option'); 
+        option.value = key; 
+        option.textContent = key; 
+        select.appendChild(option); 
+    });
+
+    // ลบ Logic การแสดง custom regimens
+    /*
     if (Object.keys(customRegimens).length > 0) {
         const divider = document.createElement('option'); divider.disabled = true; divider.textContent = '--- CUSTOM ---'; select.appendChild(divider);
         Object.keys(customRegimens).forEach(key => { const option = document.createElement('option'); option.value = key; option.textContent = key; select.appendChild(option); });
     }
+    */
+
     if (activeRegimens[currentSelection]) select.value = currentSelection;
 }
 
-// --- Backup & Restore Functions ---
-function backupData() {
-    const customRegimens = localStorage.getItem('customChemoRegimens');
-    if (!customRegimens || customRegimens === '{}') { alert('No custom data to backup!'); return; }
-    
-    const blob = new Blob([customRegimens], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `chemo_backup_${new Date().toISOString().slice(0,10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
+// --- ลบ Backup & Restore Functions ---
+/*
+function backupData() { ... }
+function restoreData(input) { ... }
+*/
 
-function restoreData(input) {
-    const file = input.files[0];
-    if (!file) return;
+// --- ลบ Admin Modal Functions และ Logic การเพิ่มสูตรยา ---
+/*
+function openAdminAuthModal() { ... }
+function verifyAdmin() { ... }
+function openManageRegimenModal() { ... }
+function addNewDrugToList() { ... }
+function updateTempDrugListUI() { ... }
+function removeTempDrug(index) { ... }
+function saveNewRegimenToStorage() { ... }
+function renderSavedRegimensList() { ... }
+function deleteCustomRegimen(name) { ... }
+*/
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const json = JSON.parse(e.target.result);
-            if (typeof json === 'object') {
-                if(confirm("This will overwrite your current custom protocols. Continue?")) {
-                    localStorage.setItem('customChemoRegimens', JSON.stringify(json));
-                    alert("Data Restored Successfully!");
-                    location.reload(); 
-                }
-            } else {
-                alert("Invalid File Format");
-            }
-        } catch (error) {
-            alert("Error reading file: " + error);
-        }
-    };
-    reader.readAsText(file);
-    input.value = ''; 
-}
-
-// --- Admin Modal Functions ---
-function openAdminAuthModal() { document.getElementById('adminPasswordInput').value = ''; document.getElementById('authError').style.display = 'none'; new bootstrap.Modal(document.getElementById('authModal')).show(); }
-function verifyAdmin() { if (document.getElementById('adminPasswordInput').value === '2015') { bootstrap.Modal.getInstance(document.getElementById('authModal')).hide(); openManageRegimenModal(); } else { document.getElementById('authError').style.display = 'block'; } }
-
-function openManageRegimenModal() { 
-    document.getElementById('newRegimenName').value = ''; 
-    document.getElementById('newDrugName').value = ''; 
-    document.getElementById('newDrugDose').value = ''; 
-    document.getElementById('newDrugType').value = 'bsa'; 
-    tempNewDrugsList = []; 
-    updateTempDrugListUI(); 
-    renderSavedRegimensList(); 
-    new bootstrap.Modal(document.getElementById('addRegimenModal')).show(); 
-}
-
-// Improved Add Drug Logic
-document.addEventListener('DOMContentLoaded', function() {
-    const typeSelect = document.getElementById('newDrugType');
-    if(typeSelect) {
-        typeSelect.addEventListener('change', function() {
-            const doseInput = document.getElementById('newDrugDose');
-            if(this.value === 'auc') { doseInput.placeholder = "Def (5)"; } else { doseInput.placeholder = "mg/m²"; }
-        });
-    }
-});
-
-function addNewDrugToList() { 
-    const name = document.getElementById('newDrugName').value.trim(); 
-    let doseVal = parseFloat(document.getElementById('newDrugDose').value); 
-    const type = document.getElementById('newDrugType').value;
-
-    if (type === 'auc' && (isNaN(doseVal) || doseVal <= 0)) { doseVal = 5; } 
-
-    if (!name) { alert("Please enter drug name"); return; }
-    if (isNaN(doseVal) || doseVal <= 0) { alert("Invalid Dose Value"); return; }
-
-    let newDrugObj = {};
-    if (type === 'auc') { newDrugObj = { name: name, type: 'auc', target_auc: doseVal }; } else { newDrugObj = { name: name, dose_m2: doseVal }; }
-
-    tempNewDrugsList.push(newDrugObj); 
-    updateTempDrugListUI(); 
-    
-    document.getElementById('newDrugName').value = ''; 
-    document.getElementById('newDrugDose').value = ''; 
-    document.getElementById('newDrugType').value = 'bsa';
-    document.getElementById('newDrugDose').placeholder = 'Val';
-    document.getElementById('newDrugName').focus(); 
-}
-
-function updateTempDrugListUI() { 
-    const ul = document.getElementById('tempDrugUl'); 
-    ul.innerHTML = ''; 
-    if (tempNewDrugsList.length === 0) { 
-        ul.innerHTML = '<li class="text-muted text-center list-group-item bg-transparent small">- NO DATA -</li>'; 
-    } else { 
-        tempNewDrugsList.forEach((drug, index) => { 
-            let displayDose = '';
-            if(drug.type === 'auc') { displayDose = `<span class="badge bg-warning text-dark">AUC ${drug.target_auc}</span>`; } else { displayDose = `${drug.dose_m2} mg/m²`; }
-            ul.innerHTML += `<li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-1 ps-0 text-light"><span>${drug.name} (${displayDose})</span><button class="btn btn-sm text-danger p-0" onclick="removeTempDrug(${index})">❌</button></li>`; 
-        }); 
-    } 
-}
-
-function removeTempDrug(index) { tempNewDrugsList.splice(index, 1); updateTempDrugListUI(); }
-function saveNewRegimenToStorage() { const regName = document.getElementById('newRegimenName').value.trim(); if (!regName) { alert("Name Required"); return; } if (tempNewDrugsList.length === 0) { alert("Drugs Required"); return; } if (DEFAULT_REGIMENS[regName]) { alert("Cannot overwrite default"); return; } const customRegimens = JSON.parse(localStorage.getItem('customChemoRegimens')) || {}; if (customRegimens[regName]) { if(!confirm("Overwrite?")) return; } customRegimens[regName] = tempNewDrugsList; localStorage.setItem('customChemoRegimens', JSON.stringify(customRegimens)); openManageRegimenModal(); loadAllRegimens(); }
-function renderSavedRegimensList() { const customRegimens = JSON.parse(localStorage.getItem('customChemoRegimens')) || {}; const ul = document.getElementById('savedRegimensList'); ul.innerHTML = ''; const keys = Object.keys(customRegimens); if (keys.length === 0) { ul.innerHTML = '<li class="list-group-item text-muted text-center bg-transparent">- EMPTY -</li>'; return; } keys.forEach(name => { const li = document.createElement('li'); li.className = 'list-group-item bg-transparent d-flex justify-content-between align-items-center text-light'; li.innerHTML = `<span>${name}</span><button class="btn btn-sm btn-outline-danger" onclick="deleteCustomRegimen('${name}')">DEL</button>`; ul.appendChild(li); }); }
-function deleteCustomRegimen(name) { if(!confirm(`Delete "${name}"?`)) return; const customRegimens = JSON.parse(localStorage.getItem('customChemoRegimens')) || {}; delete customRegimens[name]; localStorage.setItem('customChemoRegimens', JSON.stringify(customRegimens)); renderSavedRegimensList(); loadAllRegimens(); }
-
-// --- CALCULATION LOGIC ---
+// --- CALCULATION LOGIC (คงไว้เพราะเป็น Core Function) ---
 function calculateBSA(h, w) { return Math.sqrt((h * w) / 3600); }
 function calculateGFR(age, weight, gender, scr) {
     if(!age || !weight || !scr || scr <= 0) return 0;
@@ -667,16 +503,21 @@ function calculateGFR(age, weight, gender, scr) {
     return gfr;
 }
 function calculateChemoDose() {
-    let h = parseFloat(document.getElementById("height").value) || 0;
-    let w = parseFloat(document.getElementById("weight").value) || 0;
-    let age = parseFloat(document.getElementById("age").value) || 0;
-    let scr = parseFloat(document.getElementById("scr").value) || 0;
+    // ดึงค่าและแปลง , เป็น . อัตโนมัติ (เผื่อเผลอพิมพ์ลูกน้ำ)
+    let h = parseFloat(document.getElementById("height").value.replace(',', '.')) || 0;
+    let w = parseFloat(document.getElementById("weight").value.replace(',', '.')) || 0;
+    let age = parseFloat(document.getElementById("age").value.replace(',', '.')) || 0;
+    let scr = parseFloat(document.getElementById("scr").value.replace(',', '.')) || 0;
+    
     let gender = document.getElementById("gender").value;
     let protocol = document.getElementById("drugProtocol").value;
     let reduction = parseFloat(document.getElementById("doseReduction").value);
     
     let gfr = calculateGFR(age, w, gender, scr);
-    document.getElementById("gfrDisplay").innerHTML = (gfr > 0) ? `Est. CrCl: <b>${gfr.toFixed(1)}</b> ml/min` : '';
+    
+    // แสดงค่า GFR ให้เห็นชัดๆ ว่าคำนวณได้ไหม
+    let gfrText = (gfr > 0) ? `Est. CrCl: <b>${gfr.toFixed(1)}</b> ml/min` : '<span style="color:#ec4899; font-size:0.9em;">(รอค่า Scr/Age)</span>';
+    document.getElementById("gfrDisplay").innerHTML = gfrText;
 
     if (!h || !w || h <= 0 || w <= 0) { 
         document.getElementById("resultBSA").innerHTML = '0.00 <span style="font-size:1rem; opacity:0.7">m²</span>'; 
@@ -693,12 +534,11 @@ function calculateChemoDose() {
     }
 
     let drugs = activeRegimens[protocol];
-    // เช็คว่าต้องโชว์ปุ่ม AUC ไหม
     let hasAUC = drugs.some(d => d.type === 'auc');
     document.getElementById("aucContainer").style.display = hasAUC ? "block" : "none";
     
     let userTargetAUC = parseFloat(document.getElementById("targetAUC").value);
-    let reducPercent = ((1 - reduction) * 100).toFixed(0);
+    let masterReducPercent = ((1 - reduction) * 100).toFixed(0);
 
     let html = `<table style="width:100%"><thead><tr><th>DRUG</th><th>STD/Target</th><th>DOSE (mg)</th><th>-%</th></tr></thead><tbody>`;
     
@@ -707,42 +547,36 @@ function calculateChemoDose() {
         let stdDisplay = '-'; 
         let note = drug.note || ''; 
         let doseDisplayHtml = ''; 
+        let currentReducPercent = masterReducPercent; // ใช้ค่าลด Dose จาก Dropdown เป็นค่าตั้งต้น
         
         if (drug.type === 'capecitabine_special') {
             // === LOGIC คำนวณ Capecitabine (สูตรหารเม็ด) ===
             stdDisplay = `${drug.dose_m2}`;
             
-            // 1. คำนวณ mg รวมต่อวัน
-            let totalMg = bsa * drug.dose_m2;
+            // ใช้ reduction เพราะ Capecitabine ก็ถูกลด Dose ได้
+            let totalMg = (bsa * drug.dose_m2) * reduction; 
             
-            // 2. ปรับลด Dose (คิด mg ก่อน)
-            totalMg = totalMg * reduction;
-
-            // 3. แปลงเป็นเม็ด (หาร 500) แล้วปัดลง
             let rawTablets = totalMg / 500;
             let dailyTablets = Math.floor(rawTablets);
-
-            // 4. แบ่งมื้อ (เช้า - เย็น)
-            // สูตร: หาร 2 ปัดลงเป็นเย็น ที่เหลือเป็นเช้า (ถ้าคี่ เช้าจะมากกว่า 1)
             let eveningDose = Math.floor(dailyTablets / 2);
             let morningDose = dailyTablets - eveningDose;
-
-            // 5. รวมทั้งคอร์ส 14 วัน
             let totalCycleTablets = dailyTablets * 14;
 
-            // 6. สร้างข้อความแสดงผล
-            // แสดงผลเป็น: 3-0-2 (รวม 70 tab)
             doseDisplayHtml = `<span style="font-size:0.9em">${morningDose}-0-${eveningDose} <br><span style="font-size:0.75em; opacity:0.7">(${totalCycleTablets} tab)</span></span>`;
 
         } else if (drug.type === 'fixed') {
-            // === NEW: Fixed Dose (Bleomycin 30mg) ===
+            // === Fixed Dose (Bleomycin 30mg) ===
             let rawDose = drug.dose_fixed || 0;
-            finalDose = rawDose * reduction;
+            
+            finalDose = rawDose; // *** FIX DOSE เสมอ (ไม่คูณ reduction) ***
+            currentReducPercent = 0; // *** ตั้งค่า % ลด Dose เป็น 0% ***
+            
             stdDisplay = `${rawDose} mg`;
             doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
+            note = drug.note || ''; 
 
         } else if (drug.type === 'auc') {
-            // === คำนวณแบบ AUC ===
+            // === คำนวณแบบ AUC (Carboplatin) ===
             let target = userTargetAUC; 
             if(gfr > 0) {
                 let cappedGFR = (gfr > 125) ? 125 : gfr;
@@ -750,10 +584,13 @@ function calculateChemoDose() {
                 finalDose = rawDose * reduction;
                 stdDisplay = `AUC ${target}`;
                 if(gfr > 125) note += '<br><span style="font-size:0.7em; color:orange;">(GFR cap 125)</span>';
+                doseDisplayHtml = finalDose.toFixed(0);
             } else {
-                stdDisplay = `AUC ${target}`; finalDose = 0; note += '<br><span style="font-size:0.7em; color:red;">Need Scr/Age</span>';
+                stdDisplay = `AUC ${target}`; 
+                finalDose = 0; 
+                note += '<br><span style="font-size:0.7em; color:#ef4444; font-weight:bold;">⚠️ กรอก Age และ Scr</span>';
+                doseDisplayHtml = '-';
             }
-            doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
 
         } else if (drug.type === 'weight') {
             // --- คำนวณแบบ mg/kg ---
@@ -769,12 +606,12 @@ function calculateChemoDose() {
             finalDose = rawDose * reduction;
             stdDisplay = `${doseM2}`;
             
-            // เช็ค Max Dose
             if (drug.max_dose && finalDose > drug.max_dose) { finalDose = drug.max_dose; }
             doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
         }
         
-        html += `<tr><td>${drug.name}<br><span style="font-size:0.75em; color:var(--text-muted)">${note}</span></td><td style="color:#94a3b8">${stdDisplay}</td><td class="dose-value">${doseDisplayHtml}</td><td style="color:#ec4899">${reducPercent}%</td></tr>`;
+        // ใช้ currentReducPercent แทน masterReducPercent
+        html += `<tr><td>${drug.name}<br><span style="font-size:0.75em; color:var(--text-muted)">${note}</span></td><td style="color:#94a3b8">${stdDisplay}</td><td class="dose-value">${doseDisplayHtml}</td><td style="color:#ec4899">${currentReducPercent}%</td></tr>`;
     });
     
     html += "</tbody></table>"; 
