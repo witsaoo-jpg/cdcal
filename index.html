@@ -410,7 +410,6 @@ async function installPWA() {
 //  DATA & LOGIC CORE
 // =======================
 
-// แก้ไขส่วนนี้ใน <script>
 const DEFAULT_REGIMENS = {
     // --- กลุ่มมะเร็งลำไส้ (Colorectal) ---
     'mFOLFOX-6': [
@@ -444,7 +443,7 @@ const DEFAULT_REGIMENS = {
         { name: '5-FU Bolus', dose_m2: 400 }, 
         { name: '5-FU Infusion', dose_m2: 600 }
     ],
-     'Mayo's 5FU': [
+    'Mayo\'s 5FU': [
         { name: 'Leucovorin', dose_m2: 20 }, 
         { name: '5-FU Bolus', dose_m2: 375 }, 
         { name: '5-FU Bolus', dose_m2: 400 }, 
@@ -464,20 +463,20 @@ const DEFAULT_REGIMENS = {
         { name: 'Cisplatin', dose_m2: 100 }
     ],
     'XELOX': [
-    { 
-        name: 'Oxaliplatin', 
-        dose_m2: 130, 
-        unit: 'mg',
-        type: 'iv' // ระบุว่าเป็นยาฉีด (คำนวณปกติ)
-    }, 
-    { 
-        name: 'Capecitabine(500)', 
-        dose_m2: 2000, // Dose รวมต่อวัน (1000 x 2)
-        unit: 'tab',
-        note: '(oral pc เช้า-เย็น 14 วัน)',
-        type: 'capecitabine_special' // **สำคัญ** ใส่ไว้เพื่อดักจับไปคำนวณสูตรหารเม็ด
-    }
-],
+        { 
+            name: 'Oxaliplatin', 
+            dose_m2: 130, 
+            unit: 'mg',
+            type: 'iv' 
+        }, 
+        { 
+            name: 'Capecitabine(500)', 
+            dose_m2: 2000, 
+            unit: 'tab',
+            note: '(oral pc เช้า-เย็น 14 วัน)',
+            type: 'capecitabine_special' 
+        }
+    ],
 
     // --- กลุ่มมะเร็งเต้านม (Breast) ---
     'AC Regimen': [
@@ -492,7 +491,7 @@ const DEFAULT_REGIMENS = {
     'Paclitaxel + Carboplatin': [
         { name: 'Paclitaxel', dose_m2: 175 },
         { name: 'Paclitaxel', dose_m2: 225 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 } // ใช้ AUC ตั้งต้นเป็น 5
+        { name: 'Carboplatin', type: 'auc', target_auc: 5 } 
     ],
     'TIP': [
         { name: 'Paclitaxel', dose_m2: 175 },
@@ -508,14 +507,14 @@ const DEFAULT_REGIMENS = {
     ],
     'BEP': [
         { name: 'Cisplatin', dose_m2: 20 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 6 }
-         { name: 'Etoposide', dose_m2: 80 },
-        { name: 'Bleomycin', dose_m2:  }
+        { name: 'Carboplatin', type: 'auc', target_auc: 6 }, // ใส่ลูกน้ำคั่น
+        { name: 'Etoposide', dose_m2: 80 },
+        { name: 'Bleomycin', dose_m2: 30 } // ใส่เลข 30 ให้ก่อน (แก้ได้)
     ],
-     'VIP': [
+    'VIP': [
         { name: 'Cisplatin', dose_m2: 20 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 }
-         { name: 'Etoposide', dose_m2: 75 },
+        { name: 'Carboplatin', type: 'auc', target_auc: 5 }, // ใส่ลูกน้ำคั่น
+        { name: 'Etoposide', dose_m2: 75 },
         { name: 'Mesna', dose_m2: 300 },
         { name: 'Ifosfamide', dose_m2: 1200 }
     ],        
@@ -524,7 +523,7 @@ const DEFAULT_REGIMENS = {
         { name: 'Rituximab', dose_m2: 375 },
         { name: 'Cyclophosphamide', dose_m2: 750 },
         { name: 'Doxorubicin', dose_m2: 50 },
-        { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 } // ตัวอย่างมี max dose
+        { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 } 
     ]
 };
 
@@ -544,7 +543,7 @@ function loadAllRegimens() {
     if (activeRegimens[currentSelection]) select.value = currentSelection;
 }
 
-// --- Backup & Restore Functions (NEW) ---
+// --- Backup & Restore Functions ---
 function backupData() {
     const customRegimens = localStorage.getItem('customChemoRegimens');
     if (!customRegimens || customRegimens === '{}') { alert('No custom data to backup!'); return; }
@@ -568,12 +567,11 @@ function restoreData(input) {
     reader.onload = function(e) {
         try {
             const json = JSON.parse(e.target.result);
-            // Basic validation
             if (typeof json === 'object') {
                 if(confirm("This will overwrite your current custom protocols. Continue?")) {
                     localStorage.setItem('customChemoRegimens', JSON.stringify(json));
                     alert("Data Restored Successfully!");
-                    location.reload(); // Refresh to load new data
+                    location.reload(); 
                 }
             } else {
                 alert("Invalid File Format");
@@ -583,7 +581,7 @@ function restoreData(input) {
         }
     };
     reader.readAsText(file);
-    input.value = ''; // Reset input
+    input.value = ''; 
 }
 
 // --- Admin Modal Functions ---
@@ -617,7 +615,7 @@ function addNewDrugToList() {
     let doseVal = parseFloat(document.getElementById('newDrugDose').value); 
     const type = document.getElementById('newDrugType').value;
 
-    if (type === 'auc' && (isNaN(doseVal) || doseVal <= 0)) { doseVal = 5; } // Auto-fill 5 for AUC
+    if (type === 'auc' && (isNaN(doseVal) || doseVal <= 0)) { doseVal = 5; } 
 
     if (!name) { alert("Please enter drug name"); return; }
     if (isNaN(doseVal) || doseVal <= 0) { alert("Invalid Dose Value"); return; }
@@ -699,9 +697,35 @@ function calculateChemoDose() {
     let html = `<table style="width:100%"><thead><tr><th>DRUG</th><th>STD/Target</th><th>DOSE (mg)</th><th>-%</th></tr></thead><tbody>`;
     
     drugs.forEach(drug => {
-        let finalDose = 0; let stdDisplay = '-'; let note = ''; // กำหนดค่าเริ่มต้นกัน undefined
+        let finalDose = 0; 
+        let stdDisplay = '-'; 
+        let note = drug.note || ''; 
+        let doseDisplayHtml = ''; 
         
-        if (drug.type === 'auc') {
+        if (drug.type === 'capecitabine_special') {
+            // === LOGIC คำนวณ Capecitabine (สูตรหารเม็ด) ===
+            stdDisplay = `${drug.dose_m2}`;
+            
+            // 1. คำนวณ mg รวมต่อวัน
+            let totalMg = bsa * drug.dose_m2;
+            
+            // 2. ปรับลด Dose (คิด mg ก่อน)
+            totalMg = totalMg * reduction;
+
+            // 3. แปลงเป็นเม็ด (หาร 500) แล้วปัดลง
+            let rawTablets = totalMg / 500;
+            let dailyTablets = Math.floor(rawTablets);
+
+            // 4. แบ่งมื้อ (เช้า - เย็น)
+            let eveningDose = Math.floor(dailyTablets / 2);
+            let morningDose = dailyTablets - eveningDose;
+
+            // 5. รวมทั้งคอร์ส 14 วัน
+            let totalCycleTablets = dailyTablets * 14;
+
+            doseDisplayHtml = `<span style="font-size:0.9em">${morningDose}-0-${eveningDose} <br><span style="font-size:0.75em; opacity:0.7">(${totalCycleTablets} tab)</span></span>`;
+
+        } else if (drug.type === 'auc') {
             // --- คำนวณแบบ AUC ---
             let target = userTargetAUC; 
             if(gfr > 0) {
@@ -709,50 +733,31 @@ function calculateChemoDose() {
                 let rawDose = target * (cappedGFR + 25);
                 finalDose = rawDose * reduction;
                 stdDisplay = `AUC ${target}`;
-                if(gfr > 125) note = '<br><span style="font-size:0.7em; color:orange;">(GFR cap 125)</span>';
+                if(gfr > 125) note += '<br><span style="font-size:0.7em; color:orange;">(GFR cap 125)</span>';
             } else {
-                stdDisplay = `AUC ${target}`; finalDose = 0; note = '<br><span style="font-size:0.7em; color:red;">Need Scr/Age</span>';
+                stdDisplay = `AUC ${target}`; finalDose = 0; note += '<br><span style="font-size:0.7em; color:red;">Need Scr/Age</span>';
             }
+            doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
 
         } else if (drug.type === 'weight') {
-            // --- คำนวณแบบ mg/kg (แก้ปัญหา undefined ตรงนี้) ---
-            let rawDose = (drug.dose_kg || 0) * w; // คูณน้ำหนักตัว
+            // --- คำนวณแบบ mg/kg ---
+            let rawDose = (drug.dose_kg || 0) * w;
             finalDose = rawDose * reduction;
             stdDisplay = `${drug.dose_kg} mg/kg`;
+            doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
 
         } else {
-            // --- คำนวณแบบ BSA (มาตรฐาน) ---
-            // ถ้า dose_m2 ไม่มีค่า ให้ใส่ 0 กัน error
+            // --- คำนวณแบบ BSA ปกติ ---
             let doseM2 = drug.dose_m2 || 0;
             let rawDose = doseM2 * bsa;
             finalDose = rawDose * reduction;
             stdDisplay = `${doseM2}`;
+            
+            if (drug.max_dose && finalDose > drug.max_dose) { finalDose = drug.max_dose; }
+            doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
         }
-// --- เริ่มส่วนคำนวณ Capecitabine (XELOX) ---
-    
-    // 1. คำนวณจำนวนเม็ดต่อวัน (ปัดเศษลง)
-    // หมายเหตุ: ต้องใช้ตัวแปร bsa ของพี่ตรงนี้ ถ้าพี่ตั้งชื่ออื่น ให้แก้คำว่า bsa เป็นชื่อนั้นครับ
-    var capecitabine_total_mg = bsa * 2000; 
-    var capecitabine_daily_tab = Math.floor(capecitabine_total_mg / 500);
-
-    // 2. แบ่งมื้อ (เช้า - เย็น)
-    var dose_evening = Math.floor(capecitabine_daily_tab / 2);
-    var dose_morning = capecitabine_daily_tab - dose_evening;
-
-    // 3. คำนวณยอดรวมทั้งคอร์ส (14 วัน)
-    var total_cycle_tab = capecitabine_daily_tab * 14;
-
-    // 4. สร้างข้อความผลลัพธ์ (เช่น 3-0-2 / 70 tab)
-    var result_text = dose_morning + "-0-" + dose_evening + " / " + total_cycle_tab + " tab";
-
-    // 5. เอาค่าไปแสดงผล (แก้ 'your_input_id' เป็น id ช่องที่พี่ต้องการแสดงผล)
-    // document.getElementById('your_input_id').value = result_text; 
-    
-    // --- จบส่วนคำนวณ Capecitabine ---
-        // เช็ค Max Dose
-        if (drug.max_dose && finalDose > drug.max_dose) { finalDose = drug.max_dose; }
         
-        html += `<tr><td>${drug.name}${note}</td><td style="color:#94a3b8">${stdDisplay}</td><td class="dose-value">${finalDose > 0 ? finalDose.toFixed(0) : '-'}</td><td style="color:#ec4899">${reducPercent}%</td></tr>`;
+        html += `<tr><td>${drug.name}<br><span style="font-size:0.75em; color:var(--text-muted)">${note}</span></td><td style="color:#94a3b8">${stdDisplay}</td><td class="dose-value">${doseDisplayHtml}</td><td style="color:#ec4899">${reducPercent}%</td></tr>`;
     });
     
     html += "</tbody></table>"; 
