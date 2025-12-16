@@ -648,15 +648,20 @@ function calculateChemoDose() {
     }
 
     let drugs = activeRegimens[protocol];
+    // เช็คว่าต้องโชว์ปุ่ม AUC ไหม
     let hasAUC = drugs.some(d => d.type === 'auc');
     document.getElementById("aucContainer").style.display = hasAUC ? "block" : "none";
+    
     let userTargetAUC = parseFloat(document.getElementById("targetAUC").value);
     let reducPercent = ((1 - reduction) * 100).toFixed(0);
 
     let html = `<table style="width:100%"><thead><tr><th>DRUG</th><th>STD/Target</th><th>DOSE (mg)</th><th>-%</th></tr></thead><tbody>`;
+    
     drugs.forEach(drug => {
-        let finalDose = 0; let stdDisplay = ''; let note = '';
+        let finalDose = 0; let stdDisplay = '-'; let note = ''; // กำหนดค่าเริ่มต้นกัน undefined
+        
         if (drug.type === 'auc') {
+            // --- คำนวณแบบ AUC ---
             let target = userTargetAUC; 
             if(gfr > 0) {
                 let cappedGFR = (gfr > 125) ? 125 : gfr;
@@ -667,14 +672,28 @@ function calculateChemoDose() {
             } else {
                 stdDisplay = `AUC ${target}`; finalDose = 0; note = '<br><span style="font-size:0.7em; color:red;">Need Scr/Age</span>';
             }
-        } else {
-            let rawDose = drug.dose_m2 * bsa;
+
+        } else if (drug.type === 'weight') {
+            // --- คำนวณแบบ mg/kg (แก้ปัญหา undefined ตรงนี้) ---
+            let rawDose = (drug.dose_kg || 0) * w; // คูณน้ำหนักตัว
             finalDose = rawDose * reduction;
-            stdDisplay = `${drug.dose_m2}`;
+            stdDisplay = `${drug.dose_kg} mg/kg`;
+
+        } else {
+            // --- คำนวณแบบ BSA (มาตรฐาน) ---
+            // ถ้า dose_m2 ไม่มีค่า ให้ใส่ 0 กัน error
+            let doseM2 = drug.dose_m2 || 0;
+            let rawDose = doseM2 * bsa;
+            finalDose = rawDose * reduction;
+            stdDisplay = `${doseM2}`;
         }
+
+        // เช็ค Max Dose
         if (drug.max_dose && finalDose > drug.max_dose) { finalDose = drug.max_dose; }
+        
         html += `<tr><td>${drug.name}${note}</td><td style="color:#94a3b8">${stdDisplay}</td><td class="dose-value">${finalDose > 0 ? finalDose.toFixed(0) : '-'}</td><td style="color:#ec4899">${reducPercent}%</td></tr>`;
     });
+    
     html += "</tbody></table>"; 
     document.getElementById("resultMultiDose").innerHTML = html;
 }
