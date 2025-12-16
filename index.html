@@ -439,6 +439,17 @@ const DEFAULT_REGIMENS = {
         { name: '5-FU Bolus', dose_m2: 400 }, 
         { name: '5-FU Infusion', dose_m2: 1200 }
     ],
+    'de Gramont': [
+        { name: 'Leucovorin', dose_m2: 200 }, 
+        { name: '5-FU Bolus', dose_m2: 400 }, 
+        { name: '5-FU Infusion', dose_m2: 600 }
+    ],
+     'Mayo's 5FU': [
+        { name: 'Leucovorin', dose_m2: 20 }, 
+        { name: '5-FU Bolus', dose_m2: 375 }, 
+        { name: '5-FU Bolus', dose_m2: 400 }, 
+        { name: '5-FU Bolus', dose_m2: 425 }, 
+    ],
     'Carboplatin + Etoposide': [
         { name: 'Etoposide', dose_m2: 100 },
         { name: 'Carboplatin', type: 'auc', target_auc: 5 }
@@ -490,6 +501,7 @@ const DEFAULT_REGIMENS = {
         { name: 'Ifosfamide', dose_m2: 1500 },
         { name: 'Cisplatin', dose_m2: 25 },
     ],
+    
     // --- กลุ่มมะเร็งต่อมน้ำเหลือง (Lymphoma) ---
     'R-CHOP': [
         { name: 'Rituximab', dose_m2: 375 },
