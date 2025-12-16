@@ -117,6 +117,9 @@
             box-shadow: 0 0 15px var(--neon-glow); background: rgba(15, 23, 42, 0.9);
         }
 
+        .row-group { display: flex; gap: 15px; margin-bottom: 20px; }
+        .row-group > div { flex: 1; }
+
         input[type="number"] { -moz-appearance: textfield; }
         input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
@@ -179,7 +182,6 @@
         .placeholder-text { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 0.9rem; opacity: 0.6; }
         .visitor-counter { text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.75rem; opacity: 0.6; }
         
-        /* Modal & Install Button */
         .modal-content { background: #1e293b; color: white; border: 1px solid var(--border-glass); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
         .modal-header { border-bottom: 1px solid var(--border-glass); }
         .modal-footer { border-top: 1px solid var(--border-glass); }
@@ -187,6 +189,8 @@
         .form-control { background: #0f172a; border: 1px solid #334155; color: white; }
         .form-control:focus { background: #0f172a; color: white; border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
         .list-group-item { color: var(--text-main); }
+        .form-select { background-color: #0f172a; color: white; border-color: #334155; }
+        .form-select:focus { background-color: #0f172a; color: white; }
 
         #installBtn { display: none; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--neon-blue); color: var(--neon-blue); }
 
@@ -206,14 +210,37 @@
     <button id="installBtn" class="btn w-100 rounded-pill" onclick="installPWA()">📲 INSTALL APP</button>
 
     <div class="card">
-        <div class="input-group">
-            <label>📏 Height (cm)</label>
-            <input type="number" id="height" min="1" max="250" oninput="calculateChemoDose()" placeholder="_ _ _">
+        <div class="row-group">
+            <div>
+                <label>📏 Height (cm)</label>
+                <input type="number" id="height" min="1" max="250" oninput="calculateChemoDose()" placeholder="cm">
+            </div>
+            <div>
+                <label>⚖️ Weight (kg)</label>
+                <input type="number" id="weight" min="1" max="300" oninput="calculateChemoDose()" placeholder="kg">
+            </div>
         </div>
-        <div class="input-group">
-            <label>⚖️ Weight (kg)</label>
-            <input type="number" id="weight" min="1" max="300" oninput="calculateChemoDose()" placeholder="_ _ _">
+
+        <div class="row-group">
+            <div>
+                <label>⚧ Sex</label>
+                <select id="gender" onchange="calculateChemoDose()">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div>
+                <label>🎂 Age (Yr)</label>
+                <input type="number" id="age" min="1" max="120" oninput="calculateChemoDose()" placeholder="Years">
+            </div>
         </div>
+
+        <div class="input-group">
+            <label>🧪 Serum Creatinine (mg/dL)</label>
+            <input type="number" id="scr" step="0.01" min="0.1" oninput="calculateChemoDose()" placeholder="For Carboplatin">
+            <div id="gfrDisplay" style="font-size: 0.8rem; color: #4ade80; text-align: right; margin-top: 5px; min-height: 18px;"></div>
+        </div>
+
         <div class="bsa-result">
             <div class="bsa-label">BODY SURFACE AREA</div>
             <div class="bsa-value" id="resultBSA">0.00 <span style="font-size:1rem; opacity:0.7">m²</span></div>
@@ -225,6 +252,18 @@
             <label>💊 Select Protocol</label>
             <select id="drugProtocol" onchange="calculateChemoDose()">
                 <option value="">-- SELECT REGIMEN --</option>
+            </select>
+        </div>
+
+        <div class="input-group" id="aucContainer" style="display:none; animation: fadeIn 0.3s ease;">
+            <label>🎯 Target AUC</label>
+            <select id="targetAUC" onchange="calculateChemoDose()" style="border-color: var(--neon-pink);">
+                <option value="4">AUC 4</option>
+                <option value="4.5">AUC 4.5</option>
+                <option value="5" selected>AUC 5 (Standard)</option>
+                <option value="5.5">AUC 5.5</option>
+                <option value="6">AUC 6 (High)</option>
+                <option value="7">AUC 7</option>
             </select>
         </div>
 
@@ -285,13 +324,29 @@
         <div class="modal-body">
             <h6 class="text-light fw-bold">➕ ADD NEW PROTOCOL</h6>
             <div class="mb-3"><input type="text" class="form-control" id="newRegimenName" placeholder="PROTOCOL NAME"></div>
+            
             <div class="p-3 mb-3 border rounded" style="background: rgba(255,255,255,0.05);">
-                <div class="row g-2">
-                    <div class="col-7"><input type="text" class="form-control form-control-sm" id="newDrugName" placeholder="DRUG NAME"></div>
-                    <div class="col-3"><input type="number" class="form-control form-control-sm" id="newDrugDose" placeholder="mg/m²"></div>
-                    <div class="col-2"><button class="btn btn-sm btn-success w-100 h-100" onclick="addNewDrugToList()">+</button></div>
+                <label class="text-muted small mb-2">ADD DRUG TO LIST:</label>
+                <div class="row g-1 align-items-center">
+                    <div class="col-5">
+                        <input type="text" class="form-control form-control-sm" id="newDrugName" placeholder="Name (e.g. 5-FU)">
+                    </div>
+                    <div class="col-2">
+                        <input type="number" class="form-control form-control-sm" id="newDrugDose" placeholder="Val">
+                    </div>
+                    <div class="col-3">
+                        <select class="form-select form-select-sm" id="newDrugType" style="font-size:0.7rem;">
+                            <option value="bsa">mg/m²</option>
+                            <option value="auc">AUC</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-sm btn-success w-100" onclick="addNewDrugToList()">+</button>
+                    </div>
                 </div>
+                <div class="text-muted small mt-1" style="font-size:0.65rem;">*Select 'AUC' for Carboplatin</div>
             </div>
+
             <div class="mb-3">
                 <div class="temp-drug-list border rounded p-2" style="min-height: 50px; background: rgba(0,0,0,0.2);">
                     <ul id="tempDrugUl" class="list-group list-group-flush bg-transparent small"><li class="text-muted text-center list-group-item bg-transparent">- NO DATA -</li></ul>
@@ -305,6 +360,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <script>
@@ -336,11 +392,29 @@ async function installPWA() {
     }
 }
 
-// Logic เดิม
+// =======================
+//  DATA & LOGIC CORE
+// =======================
+
 const DEFAULT_REGIMENS = {
-    'mFOLFOX-6': [{ name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
-    'mFOLFIRI': [{ name: 'Irinotecan', dose_m2: 180 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }]
+    'mFOLFOX-6': [
+        { name: 'Oxaliplatin', dose_m2: 85 }, 
+        { name: 'Leucovorin', dose_m2: 200 }, 
+        { name: '5-FU Bolus', dose_m2: 400 }, 
+        { name: '5-FU Infusion', dose_m2: 1200 }
+    ],
+    'mFOLFIRI': [
+        { name: 'Irinotecan', dose_m2: 180 }, 
+        { name: 'Leucovorin', dose_m2: 200 }, 
+        { name: '5-FU Bolus', dose_m2: 400 }, 
+        { name: '5-FU Infusion', dose_m2: 1200 }
+    ],
+    'Paclitaxel + Carboplatin': [
+        { name: 'Paclitaxel', dose_m2: 175 },
+        { name: 'Carboplatin', type: 'auc', target_auc: 5 } // Default AUC 5
+    ]
 };
+
 let activeRegimens = {}; let tempNewDrugsList = [];
 
 function loadAllRegimens() {
@@ -357,29 +431,168 @@ function loadAllRegimens() {
     if (activeRegimens[currentSelection]) select.value = currentSelection;
 }
 
+// --- Admin Modal Functions ---
 function openAdminAuthModal() { document.getElementById('adminPasswordInput').value = ''; document.getElementById('authError').style.display = 'none'; new bootstrap.Modal(document.getElementById('authModal')).show(); }
 function verifyAdmin() { if (document.getElementById('adminPasswordInput').value === '2015') { bootstrap.Modal.getInstance(document.getElementById('authModal')).hide(); openManageRegimenModal(); } else { document.getElementById('authError').style.display = 'block'; } }
-function openManageRegimenModal() { document.getElementById('newRegimenName').value = ''; document.getElementById('newDrugName').value = ''; document.getElementById('newDrugDose').value = ''; tempNewDrugsList = []; updateTempDrugListUI(); renderSavedRegimensList(); new bootstrap.Modal(document.getElementById('addRegimenModal')).show(); }
-function addNewDrugToList() { const name = document.getElementById('newDrugName').value.trim(); const dose = parseFloat(document.getElementById('newDrugDose').value); if (!name || isNaN(dose) || dose <= 0) { alert("Invalid Input"); return; } tempNewDrugsList.push({ name: name, dose_m2: dose }); updateTempDrugListUI(); document.getElementById('newDrugName').value = ''; document.getElementById('newDrugDose').value = ''; document.getElementById('newDrugName').focus(); }
-function updateTempDrugListUI() { const ul = document.getElementById('tempDrugUl'); ul.innerHTML = ''; if (tempNewDrugsList.length === 0) { ul.innerHTML = '<li class="text-muted text-center list-group-item bg-transparent small">- NO DATA -</li>'; } else { tempNewDrugsList.forEach((drug, index) => { ul.innerHTML += `<li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-1 ps-0 text-light"><span>${drug.name} (${drug.dose_m2})</span><button class="btn btn-sm text-danger p-0" onclick="removeTempDrug(${index})">❌</button></li>`; }); } }
+
+function openManageRegimenModal() { 
+    document.getElementById('newRegimenName').value = ''; 
+    document.getElementById('newDrugName').value = ''; 
+    document.getElementById('newDrugDose').value = ''; 
+    document.getElementById('newDrugType').value = 'bsa'; // Reset select
+    tempNewDrugsList = []; 
+    updateTempDrugListUI(); 
+    renderSavedRegimensList(); 
+    new bootstrap.Modal(document.getElementById('addRegimenModal')).show(); 
+}
+
+function addNewDrugToList() { 
+    const name = document.getElementById('newDrugName').value.trim(); 
+    const doseVal = parseFloat(document.getElementById('newDrugDose').value); 
+    const type = document.getElementById('newDrugType').value;
+
+    if (!name || isNaN(doseVal) || doseVal <= 0) { alert("Invalid Input"); return; } 
+
+    let newDrugObj = {};
+    if (type === 'auc') {
+        newDrugObj = { name: name, type: 'auc', target_auc: doseVal };
+    } else {
+        newDrugObj = { name: name, dose_m2: doseVal };
+    }
+
+    tempNewDrugsList.push(newDrugObj); 
+    updateTempDrugListUI(); 
+    
+    // Clear inputs
+    document.getElementById('newDrugName').value = ''; 
+    document.getElementById('newDrugDose').value = ''; 
+    document.getElementById('newDrugType').value = 'bsa';
+    document.getElementById('newDrugName').focus(); 
+}
+
+function updateTempDrugListUI() { 
+    const ul = document.getElementById('tempDrugUl'); 
+    ul.innerHTML = ''; 
+    if (tempNewDrugsList.length === 0) { 
+        ul.innerHTML = '<li class="text-muted text-center list-group-item bg-transparent small">- NO DATA -</li>'; 
+    } else { 
+        tempNewDrugsList.forEach((drug, index) => { 
+            let displayDose = '';
+            if(drug.type === 'auc') {
+                displayDose = `<span class="badge bg-warning text-dark">AUC ${drug.target_auc}</span>`;
+            } else {
+                displayDose = `${drug.dose_m2} mg/m²`;
+            }
+
+            ul.innerHTML += `<li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-1 ps-0 text-light"><span>${drug.name} (${displayDose})</span><button class="btn btn-sm text-danger p-0" onclick="removeTempDrug(${index})">❌</button></li>`; 
+        }); 
+    } 
+}
+
 function removeTempDrug(index) { tempNewDrugsList.splice(index, 1); updateTempDrugListUI(); }
 function saveNewRegimenToStorage() { const regName = document.getElementById('newRegimenName').value.trim(); if (!regName) { alert("Name Required"); return; } if (tempNewDrugsList.length === 0) { alert("Drugs Required"); return; } if (DEFAULT_REGIMENS[regName]) { alert("Cannot overwrite default"); return; } const customRegimens = JSON.parse(localStorage.getItem('customChemoRegimens')) || {}; if (customRegimens[regName]) { if(!confirm("Overwrite?")) return; } customRegimens[regName] = tempNewDrugsList; localStorage.setItem('customChemoRegimens', JSON.stringify(customRegimens)); openManageRegimenModal(); loadAllRegimens(); }
 function renderSavedRegimensList() { const customRegimens = JSON.parse(localStorage.getItem('customChemoRegimens')) || {}; const ul = document.getElementById('savedRegimensList'); ul.innerHTML = ''; const keys = Object.keys(customRegimens); if (keys.length === 0) { ul.innerHTML = '<li class="list-group-item text-muted text-center bg-transparent">- EMPTY -</li>'; return; } keys.forEach(name => { const li = document.createElement('li'); li.className = 'list-group-item bg-transparent d-flex justify-content-between align-items-center text-light'; li.innerHTML = `<span>${name}</span><button class="btn btn-sm btn-outline-danger" onclick="deleteCustomRegimen('${name}')">DEL</button>`; ul.appendChild(li); }); }
 function deleteCustomRegimen(name) { if(!confirm(`Delete "${name}"?`)) return; const customRegimens = JSON.parse(localStorage.getItem('customChemoRegimens')) || {}; delete customRegimens[name]; localStorage.setItem('customChemoRegimens', JSON.stringify(customRegimens)); renderSavedRegimensList(); loadAllRegimens(); }
+
+// --- CALCULATION LOGIC ---
+
 function calculateBSA(h, w) { return Math.sqrt((h * w) / 3600); }
-function calculateChemoDose() {
-    let h = parseFloat(document.getElementById("height").value) || 0; let w = parseFloat(document.getElementById("weight").value) || 0; let protocol = document.getElementById("drugProtocol").value; let reduction = parseFloat(document.getElementById("doseReduction").value);
-    if (!h || !w || h <= 0 || w <= 0) { document.getElementById("resultBSA").innerHTML = '0.00 <span style="font-size:1rem; opacity:0.7">m²</span>'; document.getElementById("resultMultiDose").innerHTML = '<div class="placeholder-text">WAITING FOR INPUT...</div>'; return; }
-    let bsa = calculateBSA(h, w); document.getElementById("resultBSA").innerHTML = bsa.toFixed(2) + ' <span style="font-size:1rem; opacity:0.7">m²</span>';
-    if (!protocol || !activeRegimens[protocol]) { document.getElementById("resultMultiDose").innerHTML = '<div class="placeholder-text">SELECT REGIMEN</div>'; return; }
-    let reducPercent = ((1 - reduction) * 100).toFixed(0); let drugs = activeRegimens[protocol];
-    let html = `<table style="width:100%"><thead><tr><th>DRUG</th><th>mg/m²</th><th>DOSE (mg)</th><th>-%</th></tr></thead><tbody>`;
-    drugs.forEach(drug => { let dose = drug.dose_m2 * bsa * reduction; if (drug.max_dose && dose > drug.max_dose) { dose = drug.max_dose; } html += `<tr><td>${drug.name}</td><td style="color:#94a3b8">${drug.dose_m2}</td><td class="dose-value">${dose.toFixed(1)}</td><td style="color:#ec4899">${reducPercent}%</td></tr>`; });
-    html += "</tbody></table>"; document.getElementById("resultMultiDose").innerHTML = html;
+
+function calculateGFR(age, weight, gender, scr) {
+    if(!age || !weight || !scr || scr <= 0) return 0;
+    let gfr = ((140 - age) * weight) / (72 * scr);
+    if(gender === 'female') { gfr = gfr * 0.85; }
+    return gfr;
 }
+
+function calculateChemoDose() {
+    let h = parseFloat(document.getElementById("height").value) || 0;
+    let w = parseFloat(document.getElementById("weight").value) || 0;
+    let age = parseFloat(document.getElementById("age").value) || 0;
+    let scr = parseFloat(document.getElementById("scr").value) || 0;
+    let gender = document.getElementById("gender").value;
+    
+    let protocol = document.getElementById("drugProtocol").value;
+    let reduction = parseFloat(document.getElementById("doseReduction").value);
+    
+    let gfr = calculateGFR(age, w, gender, scr);
+    document.getElementById("gfrDisplay").innerHTML = (gfr > 0) ? `Est. CrCl: <b>${gfr.toFixed(1)}</b> ml/min` : '';
+
+    if (!h || !w || h <= 0 || w <= 0) { 
+        document.getElementById("resultBSA").innerHTML = '0.00 <span style="font-size:1rem; opacity:0.7">m²</span>'; 
+        document.getElementById("resultMultiDose").innerHTML = '<div class="placeholder-text">WAITING FOR INPUT...</div>'; 
+        return; 
+    }
+    let bsa = calculateBSA(h, w); 
+    document.getElementById("resultBSA").innerHTML = bsa.toFixed(2) + ' <span style="font-size:1rem; opacity:0.7">m²</span>';
+
+    if (!protocol || !activeRegimens[protocol]) { 
+        document.getElementById("resultMultiDose").innerHTML = '<div class="placeholder-text">SELECT REGIMEN</div>'; 
+        document.getElementById("aucContainer").style.display = "none";
+        return; 
+    }
+
+    let drugs = activeRegimens[protocol];
+    
+    // Check if ANY drug in this protocol is AUC type
+    let hasAUC = drugs.some(d => d.type === 'auc');
+    document.getElementById("aucContainer").style.display = hasAUC ? "block" : "none";
+
+    let userTargetAUC = parseFloat(document.getElementById("targetAUC").value);
+    let reducPercent = ((1 - reduction) * 100).toFixed(0);
+
+    let html = `<table style="width:100%"><thead><tr><th>DRUG</th><th>STD/Target</th><th>DOSE (mg)</th><th>-%</th></tr></thead><tbody>`;
+    
+    drugs.forEach(drug => {
+        let finalDose = 0;
+        let stdDisplay = '';
+        let note = '';
+
+        if (drug.type === 'auc') {
+            // Priority: User Dropdown > Default in Protocol
+            let target = userTargetAUC; 
+            
+            if(gfr > 0) {
+                let cappedGFR = (gfr > 125) ? 125 : gfr;
+                let rawDose = target * (cappedGFR + 25);
+                finalDose = rawDose * reduction;
+                stdDisplay = `AUC ${target}`;
+                if(gfr > 125) note = '<br><span style="font-size:0.7em; color:orange;">(GFR cap 125)</span>';
+            } else {
+                stdDisplay = `AUC ${target}`;
+                finalDose = 0;
+                note = '<br><span style="font-size:0.7em; color:red;">Need Scr/Age</span>';
+            }
+        } else {
+            let rawDose = drug.dose_m2 * bsa;
+            finalDose = rawDose * reduction;
+            stdDisplay = `${drug.dose_m2}`;
+        }
+
+        if (drug.max_dose && finalDose > drug.max_dose) { finalDose = drug.max_dose; }
+
+        html += `<tr>
+            <td>${drug.name}${note}</td>
+            <td style="color:#94a3b8">${stdDisplay}</td>
+            <td class="dose-value">${finalDose > 0 ? finalDose.toFixed(0) : '-'}</td>
+            <td style="color:#ec4899">${reducPercent}%</td>
+        </tr>`;
+    });
+    
+    html += "</tbody></table>"; 
+    document.getElementById("resultMultiDose").innerHTML = html;
+}
+
 function updateVisitorCount() { let count = parseInt(localStorage.getItem('visitorCount') || '0'); count++; localStorage.setItem('visitorCount', count); }
+
 window.onload = function() { updateVisitorCount(); loadAllRegimens(); calculateChemoDose(); }
-document.addEventListener('DOMContentLoaded', function() { const button = document.querySelector('.calculate-button'); if (button) { button.addEventListener('touchstart', function() { this.style.transform = 'scale(0.96)'; }); button.addEventListener('touchend', function() { this.style.transform = 'scale(1)'; }); } });
+document.addEventListener('DOMContentLoaded', function() { 
+    const button = document.querySelector('.calculate-button'); 
+    if (button) { 
+        button.addEventListener('touchstart', function() { this.style.transform = 'scale(0.96)'; }); 
+        button.addEventListener('touchend', function() { this.style.transform = 'scale(1)'; }); 
+    } 
+});
 </script>
 
 </body>
