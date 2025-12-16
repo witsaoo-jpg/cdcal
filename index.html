@@ -452,9 +452,21 @@ const DEFAULT_REGIMENS = {
         { name: 'Cisplatin', dose_m2: 75 },
         { name: 'Cisplatin', dose_m2: 100 },
     ],
-    'Capecitabine (Xeloda)': [
-        { name: 'Capecitabine', dose_m2: 1000, note: '(oral bid)' } // ตัวอย่างยากิน
-    ],
+    'XELOX': [
+    { 
+        name: 'Oxaliplatin', 
+        dose_m2: 130, 
+        unit: 'mg',
+        type: 'iv' // ระบุว่าเป็นยาฉีด (คำนวณปกติ)
+    }, 
+    { 
+        name: 'Capecitabine(500)', 
+        dose_m2: 2000, // Dose รวมต่อวัน (1000 x 2)
+        unit: 'tab',
+        note: '(oral pc เช้า-เย็น 14 วัน)',
+        type: 'capecitabine_special' // **สำคัญ** ใส่ไว้เพื่อดักจับไปคำนวณสูตรหารเม็ด
+    }
+],
 
     // --- กลุ่มมะเร็งเต้านม (Breast) ---
     'AC Regimen': [
