@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
-    <meta name="description" content="Chemo Calculator: Future Edition">
+    <meta name="description" content="Chemo Calculator: Future Edition by Vitsanukorn">
     
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="icon-192.png"> <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ChemoCalc">
 
@@ -23,6 +22,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
+        /* --- CSS เดิมทั้งหมด (คงเดิมไว้) --- */
         :root {
             --bg-dark: #0f172a;
             --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
@@ -364,7 +364,11 @@
 </div>
 
 <script>
-// PWA Service Worker Registration
+// =======================
+//  PWA SYSTEM LOGIC
+// =======================
+
+// 1. Register Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
@@ -373,12 +377,15 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Install Button Logic
+// 2. Install Button Logic (Deferred Prompt)
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
     e.preventDefault();
     deferredPrompt = e;
-    document.getElementById('installBtn').style.display = 'block';
+    // Show the install button
+    const installBtn = document.getElementById('installBtn');
+    if(installBtn) installBtn.style.display = 'block';
 });
 
 async function installPWA() {
@@ -386,6 +393,7 @@ async function installPWA() {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
+            console.log('User accepted the PWA prompt');
             document.getElementById('installBtn').style.display = 'none';
         }
         deferredPrompt = null;
