@@ -702,37 +702,31 @@ function calculateChemoDose() {
 
     let html = `<table style="width:100%"><thead><tr><th>DRUG</th><th>STD/Target</th><th>DOSE (mg)</th><th>-%</th></tr></thead><tbody>`;
     
-    drugs.forEach(drug => {
+drugs.forEach(drug => {
         let finalDose = 0; 
         let stdDisplay = '-'; 
         let note = drug.note || ''; 
         let doseDisplayHtml = ''; 
         
         if (drug.type === 'capecitabine_special') {
-            // === LOGIC คำนวณ Capecitabine (สูตรหารเม็ด) ===
+            // === Capecitabine ===
             stdDisplay = `${drug.dose_m2}`;
-            
-            // 1. คำนวณ mg รวมต่อวัน
-            let totalMg = bsa * drug.dose_m2;
-            
-            // 2. ปรับลด Dose (คิด mg ก่อน)
-            totalMg = totalMg * reduction;
-
-            // 3. แปลงเป็นเม็ด (หาร 500) แล้วปัดลง
-            let rawTablets = totalMg / 500;
-            let dailyTablets = Math.floor(rawTablets);
-
-            // 4. แบ่งมื้อ (เช้า - เย็น)
+            let totalMg = (bsa * drug.dose_m2) * reduction;
+            let dailyTablets = Math.floor(totalMg / 500);
             let eveningDose = Math.floor(dailyTablets / 2);
             let morningDose = dailyTablets - eveningDose;
-
-            // 5. รวมทั้งคอร์ส 14 วัน
             let totalCycleTablets = dailyTablets * 14;
-
             doseDisplayHtml = `<span style="font-size:0.9em">${morningDose}-0-${eveningDose} <br><span style="font-size:0.75em; opacity:0.7">(${totalCycleTablets} tab)</span></span>`;
 
+        } else if (drug.type === 'fixed') {
+            // === NEW: Fixed Dose (Bleomycin 30mg) ===
+            let rawDose = drug.dose_fixed;
+            finalDose = rawDose * reduction;
+            stdDisplay = `${rawDose} mg`;
+            doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
+
         } else if (drug.type === 'auc') {
-            // --- คำนวณแบบ AUC ---
+            // === AUC ===
             let target = userTargetAUC; 
             if(gfr > 0) {
                 let cappedGFR = (gfr > 125) ? 125 : gfr;
@@ -746,33 +740,22 @@ function calculateChemoDose() {
             doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
 
         } else if (drug.type === 'weight') {
-            // --- คำนวณแบบ mg/kg ---
+            // === mg/kg ===
             let rawDose = (drug.dose_kg || 0) * w;
             finalDose = rawDose * reduction;
             stdDisplay = `${drug.dose_kg} mg/kg`;
             doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
 
         } else {
-            // --- คำนวณแบบ BSA ปกติ ---
+            // === BSA ปกติ ===
             let doseM2 = drug.dose_m2 || 0;
             let rawDose = doseM2 * bsa;
             finalDose = rawDose * reduction;
             stdDisplay = `${doseM2}`;
-            
             if (drug.max_dose && finalDose > drug.max_dose) { finalDose = drug.max_dose; }
             doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
         }
-        } else if (drug.type === 'fixed') {
-            // === คำนวณแบบ Fixed Dose (ปริมาณคงที่) ===
-            let rawDose = drug.dose_fixed;
-            
-            // ยังคงคำนวณ % ลด Dose ตามที่เลือกใน Dropdown
-            finalDose = rawDose * reduction;
-            
-            stdDisplay = `${rawDose} mg`; // แสดงในช่องกลางว่า 30 mg
-            doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
-
-        }
+        
         html += `<tr><td>${drug.name}<br><span style="font-size:0.75em; color:var(--text-muted)">${note}</span></td><td style="color:#94a3b8">${stdDisplay}</td><td class="dose-value">${doseDisplayHtml}</td><td style="color:#ec4899">${reducPercent}%</td></tr>`;
     });
     
