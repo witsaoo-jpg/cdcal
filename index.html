@@ -112,15 +112,31 @@
             box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
         }
 
-        /* Result Styles - สไตล์เดิมที่สวยงาม */
+        /* Result Styles */
         .result-box {
             background: rgba(15, 23, 42, 0.8); padding: 20px;
             border-radius: 16px; border: 1px solid var(--border-glass);
+            /* เพิ่ม: ป้องกันไม่ให้กล่องขยายเกินจอ */
+            max-width: 100%;
+            overflow: hidden;
         }
         .result-header { font-weight: 600; color: var(--neon-blue); font-size: 1.1rem; margin-bottom: 15px; text-align: center; text-transform: uppercase; }
 
-        .result-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        .result-table th { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; padding: 0 10px; text-align: center; }
+        /* เพิ่ม: คลาสสำหรับกรอบหุ้มตาราง เพื่อให้เลื่อนแนวนอนได้ */
+        #resultMultiDose {
+            width: 100%;
+            overflow-x: auto; /* หัวใจสำคัญ: ถ้ากว้างเกินให้มี scrollbar แนวนอน */
+            -webkit-overflow-scrolling: touch; /* เพื่อให้เลื่อนลื่นๆ บน iOS */
+        }
+
+        .result-table { 
+            width: 100%; 
+            border-collapse: separate; 
+            border-spacing: 0 8px; 
+            /* เพิ่ม: กำหนดความกว้างขั้นต่ำเพื่อให้ตารางไม่บีบจนเละ */
+            min-width: 500px; 
+        }
+        .result-table th { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; padding: 0 10px; text-align: center; white-space: nowrap; }
         .result-table td {
             background: rgba(255, 255, 255, 0.03); padding: 15px 10px; text-align: center;
             border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -134,6 +150,17 @@
             color: var(--neon-pink); font-weight: 500;
         }
         .dose-value { color: var(--neon-blue); font-weight: 700; font-size: 1.3rem; text-shadow: 0 0 8px rgba(6, 182, 212, 0.3); }
+
+        /* Media Query สำหรับมือถือจอเล็ก */
+        @media (max-width: 576px) {
+            .calculator-container { padding: 20px 15px; }
+            .card { padding: 20px; }
+            /* ลด padding ในตารางลงเมื่ออยู่ในมือถือ */
+            .result-table th, .result-table td { padding: 15px 5px; }
+            .result-table th { padding: 0 5px; }
+            .result-table tr td:first-child { padding-left: 10px; }
+            .dose-value { font-size: 1.1rem; }
+        }
 
         .handbook-btn {
             background: rgba(6, 182, 212, 0.1); border: 1px dashed var(--neon-blue);
