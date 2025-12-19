@@ -111,9 +111,6 @@
         .row-group { display: flex; gap: 15px; margin-bottom: 20px; }
         .row-group > div { flex: 1; }
 
-        input[type="number"] { -moz-appearance: textfield; }
-        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-
         .bsa-result {
             margin-top: 15px;
             background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(0,0,0,0));
@@ -123,15 +120,7 @@
             box-shadow: 0 0 20px rgba(236, 72, 153, 0.2);
             position: relative; overflow: hidden;
         }
-        
-        .bsa-result::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(to bottom right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%);
-            transform: rotate(45deg); animation: shine 3s infinite;
-        }
-        @keyframes shine { 0% {transform: translateX(-100%) rotate(45deg);} 100% {transform: translateX(100%) rotate(45deg);} }
 
-        .bsa-label { font-size: 0.8rem; color: #fbcfe8; letter-spacing: 1px; margin-bottom: 5px; }
         .bsa-value { font-size: 2.2rem; font-weight: 700; text-shadow: 0 0 10px var(--neon-pink); }
 
         .calculate-button {
@@ -143,21 +132,10 @@
             box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
             transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
         }
-        .calculate-button:active { transform: scale(0.96); box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
 
         .result-box {
             background: rgba(15, 23, 42, 0.8); padding: 20px;
             border-radius: 16px; border: 1px solid var(--border-glass); position: relative;
-        }
-        .result-box::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
-        }
-
-        .result-header {
-            font-weight: 600; color: var(--neon-blue);
-            font-size: 1.1rem; margin-bottom: 15px; text-align: center;
-            text-transform: uppercase; letter-spacing: 1px;
         }
 
         .result-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
@@ -166,47 +144,33 @@
             background: rgba(255, 255, 255, 0.03); padding: 15px 10px; text-align: center;
             border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
         }
+        
+        /* การจัดกึ่งกลางคอลัมน์ชื่อยา (ชิดซ้ายเพื่อความชัดเจน) */
         .result-table tr td:first-child { 
             border-left: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 10px 0 0 10px; 
-            font-weight: 600; 
-            color: white; 
-            text-align: left; 
-            padding-left: 15px; 
+            border-radius: 10px 0 0 10px; font-weight: 600; color: white; text-align: left; padding-left: 15px; 
+        }
+
+        /* คอลัมน์ Dose และ % จัดกลางทั้งหมด */
+        .dose-value { 
+            color: var(--neon-blue); font-weight: 700; font-size: 1.1rem; 
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.3); text-align: center !important; 
         }
         .result-table tr td:last-child { 
             border-right: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 0 10px 10px 0; 
-            color: var(--text-muted);
-            text-align: center; /* FIX: % ลด Dose จัดกลาง */
-        }
-        
-        /* แก้ไข/เน้นส่วนที่แสดง Dose ให้น้ำหนักการจัดกลางมากที่สุด */
-        .dose-value { 
-            color: var(--neon-blue); 
-            font-weight: 700; 
-            font-size: 1.1rem; 
-            text-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
-            text-align: center !important; /* FIX: เน้นการจัดกลาง */
+            border-radius: 0 10px 10px 0; color: var(--text-muted); text-align: center; 
         }
 
-        .placeholder-text { text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 0.9rem; opacity: 0.6; }
-        .visitor-counter { text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.75rem; opacity: 0.6; }
-        
-        .modal-content { background: #1e293b; color: white; border: 1px solid var(--border-glass); box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        .handbook-btn {
+            background: rgba(6, 182, 212, 0.1); border: 1px dashed var(--neon-blue);
+            color: var(--neon-blue); margin-bottom: 15px; padding: 10px; font-size: 0.9rem;
+            width: 100%; border-radius: 50px; cursor: pointer; transition: all 0.3s;
+        }
+        .handbook-btn:hover { background: rgba(6, 182, 212, 0.2); }
+
+        .modal-content { background: #0f172a; color: white; border: 1px solid var(--border-glass); }
         .modal-header { border-bottom: 1px solid var(--border-glass); }
-        .modal-footer { border-top: 1px solid var(--border-glass); }
         .btn-close { filter: invert(1); }
-        .form-control { background: #0f172a; border: 1px solid #334155; color: white; }
-        .form-control:focus { background: #0f172a; color: white; border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
-        .list-group-item { color: var(--text-main); }
-        .form-select { background-color: #0f172a; color: white; border-color: #334155; }
-        .form-select:focus { background-color: #0f172a; color: white; }
-
-        #installBtn { display: none; margin-bottom: 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--neon-blue); color: var(--neon-blue); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .card, .result-box { animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
     </style>
 </head>
 <body>
@@ -217,7 +181,9 @@
 </div>
 
 <div class="calculator-container">
-    <button id="installBtn" class="btn w-100 rounded-pill" onclick="installPWA()">📲 INSTALL APP</button>
+    <button class="handbook-btn" data-bs-toggle="modal" data-bs-target="#handbookModal">📘 คู่มือการใช้งาน (Handbook)</button>
+    
+    <button id="installBtn" class="btn w-100 rounded-pill mb-3" style="display:none; background: rgba(255,255,255,0.1); border: 1px solid var(--neon-blue); color: var(--neon-blue);" onclick="installPWA()">📲 INSTALL APP</button>
 
     <div class="card">
         <div class="row-group">
@@ -265,7 +231,7 @@
             </select>
         </div>
 
-        <div class="input-group" id="aucContainer" style="display:none; animation: fadeIn 0.3s ease;">
+        <div class="input-group" id="aucContainer" style="display:none;">
             <label>🎯 Target AUC</label>
             <select id="targetAUC" onchange="calculateChemoDose()" style="border-color: var(--neon-pink);">
                 <option value="4">AUC 4</option>
@@ -307,21 +273,31 @@
     </div>
 </div>
 
+<div class="modal fade" id="handbookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-info">📘 Handbook & Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="handbook_CDC.png" alt="Handbook CDC" class="img-fluid rounded border">
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-// PWA Logic (เหมือนเดิม)
+// PWA Logic
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('SW registered!', reg))
-        .catch(err => console.log('SW failed', err));
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW failed', err));
     });
 }
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const installBtn = document.getElementById('installBtn');
-    if(installBtn) installBtn.style.display = 'block';
+    e.preventDefault(); deferredPrompt = e;
+    document.getElementById('installBtn').style.display = 'block';
 });
 async function installPWA() {
     if (deferredPrompt) {
@@ -332,152 +308,34 @@ async function installPWA() {
     }
 }
 
-// =======================
-//  DATA & LOGIC CORE
-// =======================
-
 const DEFAULT_REGIMENS = {
-    // --- กลุ่มมะเร็งลำไส้ (Colorectal) ---
-    'mFOLFOX-6': [
-        { name: 'Oxaliplatin', dose_m2: 85 }, 
-        { name: 'Leucovorin', dose_m2: 200 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Infusion', dose_m2: 1200 }
-    ],
-    'mFOLFOX-6+Avastin': [
-        { name: 'Avastin', type: 'weight', dose_kg: 5 }, 
-        { name: 'Oxaliplatin', dose_m2: 85 }, 
-        { name: 'Leucovorin', dose_m2: 200 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Infusion', dose_m2: 1200 }
-    ],
-    'mFOLFIRI': [
-        { name: 'Irinotecan', dose_m2: 180 }, 
-        { name: 'Leucovorin', dose_m2: 200 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Infusion', dose_m2: 1200 }
-    ],
-    'mFOLFIRI+Avastin': [
-        { name: 'Avastin', type: 'weight', dose_kg: 5 },
-        { name: 'Irinotecan', dose_m2: 180 }, 
-        { name: 'Leucovorin', dose_m2: 200 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Infusion', dose_m2: 1200 }
-    ],
-    'de Gramont': [
-        { name: 'Leucovorin', dose_m2: 200 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Infusion', dose_m2: 600 }
-    ],
-    'Mayo\'s 5FU': [
-        { name: 'Leucovorin', dose_m2: 20 }, 
-        { name: '5-FU Bolus', dose_m2: 375 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Bolus', dose_m2: 425 } 
-    ],
-    'Carboplatin + Etoposide': [
-        { name: 'Etoposide', dose_m2: 100 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 }
-    ],
-    'Carboplatin + 5-Fu': [
-        { name: '5-FU', dose_m2: 1000 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 }
-    ],
-    'Cisplatin + 5-Fu': [
-        { name: '5-FU', dose_m2: 1000 },
-        { name: 'Cisplatin', dose_m2: 75 },
-        { name: 'Cisplatin', dose_m2: 100 }
-    ],
-    'XELOX': [
-        { 
-            name: 'Oxaliplatin', 
-            dose_m2: 130, 
-            unit: 'mg',
-            type: 'iv' 
-        }, 
-        { 
-            name: 'Capecitabine(500)', 
-            dose_m2: 2000, 
-            unit: 'tab',
-            note: '(oral pc เช้า-เย็น 14 วัน)',
-            type: 'capecitabine_special' 
-        }
-    ],
-
-    // --- กลุ่มมะเร็งเต้านม (Breast) ---
-    'AC Regimen': [
-        { name: 'Doxorubicin', dose_m2: 60 },
-        { name: 'Cyclophosphamide', dose_m2: 600 }
-    ],
-    'Paclitaxel (Weekly)': [
-        { name: 'Paclitaxel', dose_m2: 80 }
-    ],
-
-    // --- กลุ่มมะเร็งปอด (Lung) & อื่นๆ ที่ใช้ Carboplatin ---
-    'Paclitaxel + Carboplatin': [
-        { name: 'Paclitaxel', dose_m2: 175 },
-        { name: 'Paclitaxel', dose_m2: 225 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 } 
-    ],
-    'TIP': [
-        { name: 'Paclitaxel', dose_m2: 175 },
-        { name: 'Paclitaxel', dose_m2: 225 },
-        { name: 'Mesna', dose_m2: 300 },
-        { name: 'Ifosfamide', dose_m2: 1500 },
-        { name: 'Cisplatin', dose_m2: 25 }
-    ],
-    'Ifosfamide+Etoposide': [
-        { name: 'Mesna', dose_m2: 300 },
-        { name: 'Ifosfamide', dose_m2: 1500 },
-        { name: 'Etoposide', dose_m2: 80 }
-    ],
-    'BEP': [
-        { name: 'Cisplatin', dose_m2: 20 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 6 }, 
-        { name: 'Etoposide', dose_m2: 80 },
-        { 
-            name: 'Bleomycin', 
-            type: 'fixed', 
-            dose_fixed: 30, 
-            note: '(Max 30 mg)' 
-        }
-    ],
-    'VIP': [
-        { name: 'Cisplatin', dose_m2: 20 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 }, 
-        { name: 'Etoposide', dose_m2: 75 },
-        { name: 'Mesna', dose_m2: 300 },
-        { name: 'Ifosfamide', dose_m2: 1200 }
-    ],        
-    // --- กลุ่มมะเร็งต่อมน้ำเหลือง (Lymphoma) ---
-    'R-CHOP': [
-        { name: 'Rituximab', dose_m2: 375 },
-        { name: 'Cyclophosphamide', dose_m2: 750 },
-        { name: 'Doxorubicin', dose_m2: 50 },
-        { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 } 
-    ]
+    'mFOLFOX-6': [{ name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
+    'mFOLFOX-6+Avastin': [{ name: 'Avastin', type: 'weight', dose_kg: 5 }, { name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
+    'mFOLFIRI': [{ name: 'Irinotecan', dose_m2: 180 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
+    'mFOLFIRI+Avastin': [{ name: 'Avastin', type: 'weight', dose_kg: 5 }, { name: 'Irinotecan', dose_m2: 180 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
+    'de Gramont': [{ name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 600 }],
+    'Mayo\'s 5FU': [{ name: 'Leucovorin', dose_m2: 20 }, { name: '5-FU Bolus', dose_m2: 375 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Bolus', dose_m2: 425 }],
+    'Carboplatin + Etoposide': [{ name: 'Etoposide', dose_m2: 100 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }],
+    'Carboplatin + 5-Fu': [{ name: '5-FU', dose_m2: 1000 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }],
+    'Cisplatin + 5-Fu': [{ name: '5-FU', dose_m2: 1000 }, { name: 'Cisplatin', dose_m2: 75 }, { name: 'Cisplatin', dose_m2: 100 }],
+    'XELOX': [{ name: 'Oxaliplatin', dose_m2: 130, type: 'iv' }, { name: 'Capecitabine(500)', dose_m2: 2000, note: '(oral pc เช้า-เย็น 14 วัน)', type: 'capecitabine_special' }],
+    'AC Regimen': [{ name: 'Doxorubicin', dose_m2: 60 }, { name: 'Cyclophosphamide', dose_m2: 600 }],
+    'Paclitaxel (Weekly)': [{ name: 'Paclitaxel', dose_m2: 80 }],
+    'Paclitaxel + Carboplatin': [{ name: 'Paclitaxel', dose_m2: 175 }, { name: 'Paclitaxel', dose_m2: 225 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }],
+    'TIP': [{ name: 'Paclitaxel', dose_m2: 175 }, { name: 'Paclitaxel', dose_m2: 225 }, { name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1500 }, { name: 'Cisplatin', dose_m2: 25 }],
+    'Ifosfamide+Etoposide': [{ name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1500 }, { name: 'Etoposide', dose_m2: 80 }],
+    'BEP': [{ name: 'Cisplatin', dose_m2: 20 }, { name: 'Carboplatin', type: 'auc', target_auc: 6 }, { name: 'Etoposide', dose_m2: 80 }, { name: 'Bleomycin', type: 'fixed', dose_fixed: 30, note: '(Max 30 mg)' }],
+    'VIP': [{ name: 'Cisplatin', dose_m2: 20 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }, { name: 'Etoposide', dose_m2: 75 }, { name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1200 }],
+    'R-CHOP': [{ name: 'Rituximab', dose_m2: 375 }, { name: 'Cyclophosphamide', dose_m2: 750 }, { name: 'Doxorubicin', dose_m2: 50 }, { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 }]
 };
 
-let activeRegimens = {}; 
-
 function loadAllRegimens() {
-    const customRegimens = {}; 
-    activeRegimens = { ...DEFAULT_REGIMENS, ...customRegimens };
     const select = document.getElementById('drugProtocol');
-    const currentSelection = select.value;
-    select.innerHTML = '<option value="">-- SELECT REGIMEN --</option>';
-    
-    Object.keys(DEFAULT_REGIMENS).forEach(key => { 
-        const option = document.createElement('option'); 
-        option.value = key; 
-        option.textContent = key; 
-        select.appendChild(option); 
+    Object.keys(DEFAULT_REGIMENS).forEach(key => {
+        const option = document.createElement('option'); option.value = key; option.textContent = key; select.appendChild(option);
     });
-
-    if (activeRegimens[currentSelection]) select.value = currentSelection;
 }
 
-// --- CALCULATION LOGIC (คงไว้เพราะเป็น Core Function) ---
 function calculateBSA(h, w) { return Math.sqrt((h * w) / 3600); }
 function calculateGFR(age, weight, gender, scr) {
     if(!age || !weight || !scr || scr <= 0) return 0;
@@ -485,129 +343,70 @@ function calculateGFR(age, weight, gender, scr) {
     if(gender === 'female') { gfr = gfr * 0.85; }
     return gfr;
 }
+
 function calculateChemoDose() {
-    // ดึงค่าและแปลง , เป็น . อัตโนมัติ (เผื่อเผลอพิมพ์ลูกน้ำ)
-    let h = parseFloat(document.getElementById("height").value.replace(',', '.')) || 0;
-    let w = parseFloat(document.getElementById("weight").value.replace(',', '.')) || 0;
-    let age = parseFloat(document.getElementById("age").value.replace(',', '.')) || 0;
-    let scr = parseFloat(document.getElementById("scr").value.replace(',', '.')) || 0;
-    
+    let h = parseFloat(document.getElementById("height").value) || 0;
+    let w = parseFloat(document.getElementById("weight").value) || 0;
+    let age = parseFloat(document.getElementById("age").value) || 0;
+    let scr = parseFloat(document.getElementById("scr").value) || 0;
     let gender = document.getElementById("gender").value;
     let protocol = document.getElementById("drugProtocol").value;
     let reduction = parseFloat(document.getElementById("doseReduction").value);
     
     let gfr = calculateGFR(age, w, gender, scr);
-    
-    // แสดงค่า GFR ให้เห็นชัดๆ ว่าคำนวณได้ไหม
-    let gfrText = (gfr > 0) ? `Est. CrCl: <b>${gfr.toFixed(1)}</b> ml/min` : '<span style="color:#ec4899; font-size:0.9em;">(รอค่า Scr/Age)</span>';
-    document.getElementById("gfrDisplay").innerHTML = gfrText;
+    document.getElementById("gfrDisplay").innerHTML = (gfr > 0) ? `Est. CrCl: <b>${gfr.toFixed(1)}</b> ml/min` : '<span style="color:#ec4899; font-size:0.9em;">(รอค่า Scr/Age)</span>';
 
-    if (!h || !w || h <= 0 || w <= 0) { 
-        document.getElementById("resultBSA").innerHTML = '0.00 <span style="font-size:1rem; opacity:0.7">m²</span>'; 
-        document.getElementById("resultMultiDose").innerHTML = '<div class="placeholder-text">WAITING FOR INPUT...</div>'; 
-        return; 
+    if (!h || !w) {
+        document.getElementById("resultBSA").innerHTML = '0.00 <span style="font-size:1rem; opacity:0.7">m²</span>';
+        document.getElementById("resultMultiDose").innerHTML = '<div class="placeholder-text">WAITING FOR INPUT...</div>';
+        return;
     }
-    let bsa = calculateBSA(h, w); 
+    let bsa = calculateBSA(h, w);
     document.getElementById("resultBSA").innerHTML = bsa.toFixed(2) + ' <span style="font-size:1rem; opacity:0.7">m²</span>';
 
-    if (!protocol || !activeRegimens[protocol]) { 
-        document.getElementById("resultMultiDose").innerHTML = '<div class="placeholder-text">SELECT REGIMEN</div>'; 
+    if (!protocol) {
+        document.getElementById("resultMultiDose").innerHTML = '<div class="placeholder-text">SELECT REGIMEN</div>';
         document.getElementById("aucContainer").style.display = "none";
-        return; 
+        return;
     }
 
-    let drugs = activeRegimens[protocol];
-    let hasAUC = drugs.some(d => d.type === 'auc');
-    document.getElementById("aucContainer").style.display = hasAUC ? "block" : "none";
+    let drugs = DEFAULT_REGIMENS[protocol];
+    document.getElementById("aucContainer").style.display = drugs.some(d => d.type === 'auc') ? "block" : "none";
     
-    let userTargetAUC = parseFloat(document.getElementById("targetAUC").value);
-    let masterReducPercent = ((1 - reduction) * 100).toFixed(0);
+    let targetAUC = parseFloat(document.getElementById("targetAUC").value);
+    let reducPercent = ((1 - reduction) * 100).toFixed(0);
 
-    let html = `<table style="width:100%"><thead><tr><th>DRUG</th><th>STD/Target</th><th>DOSE (mg)</th><th>-%</th></tr></thead><tbody>`;
+    let html = `<table class="result-table"><thead><tr><th>DRUG</th><th>STD</th><th>DOSE (mg)</th><th>-%</th></tr></thead><tbody>`;
     
     drugs.forEach(drug => {
-        let finalDose = 0; 
-        let stdDisplay = '-'; 
-        let note = drug.note || ''; 
-        let doseDisplayHtml = ''; 
-        let currentReducPercent = masterReducPercent; // ใช้ค่าลด Dose จาก Dropdown เป็นค่าตั้งต้น
+        let finalDose = 0; let stdDisplay = '-'; let note = drug.note || ''; let doseHtml = ''; let currentReduc = reducPercent;
         
         if (drug.type === 'capecitabine_special') {
-            // === LOGIC คำนวณ Capecitabine (สูตรหารเม็ด) ===
             stdDisplay = `${drug.dose_m2}`;
-            
-            // ใช้ reduction เพราะ Capecitabine ก็ถูกลด Dose ได้
-            let totalMg = (bsa * drug.dose_m2) * reduction; 
-            
-            let rawTablets = totalMg / 500;
-            let dailyTablets = Math.floor(rawTablets);
-            let eveningDose = Math.floor(dailyTablets / 2);
-            let morningDose = dailyTablets - eveningDose;
-            let totalCycleTablets = dailyTablets * 14;
-
-            // FIX: ใช้ div ครอบเพื่อให้จัดกลางได้
-            doseDisplayHtml = `<div><span style="font-size:0.9em">${morningDose}-0-${eveningDose}</span> <br><span style="font-size:0.75em; opacity:0.7">(${totalCycleTablets} tab)</span></div>`;
-
+            let dailyTab = Math.floor((bsa * drug.dose_m2 * reduction) / 500);
+            let eve = Math.floor(dailyTab / 2); let morn = dailyTab - eve;
+            doseHtml = `<div class="text-center"><span style="font-size:0.9em">${morn}-0-${eve}</span><br><span style="font-size:0.7em; opacity:0.7">(${dailyTab*14} tab)</span></div>`;
         } else if (drug.type === 'fixed') {
-            // === Fixed Dose (Bleomycin 30mg) ===
-            let rawDose = drug.dose_fixed || 0;
-            
-            finalDose = rawDose; // FIX DOSE เสมอ (ไม่คูณ reduction)
-            currentReducPercent = 0; // ตั้งค่า % ลด Dose เป็น 0% 
-            
-            stdDisplay = `${rawDose} mg`;
-            doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
-            note = drug.note || ''; 
-
+            finalDose = drug.dose_fixed; currentReduc = 0; stdDisplay = `${drug.dose_fixed} mg`; doseHtml = finalDose.toFixed(0);
         } else if (drug.type === 'auc') {
-            // === คำนวณแบบ AUC (Carboplatin) ===
-            let target = userTargetAUC; 
             if(gfr > 0) {
-                let cappedGFR = (gfr > 125) ? 125 : gfr;
-                let rawDose = target * (cappedGFR + 25);
-                finalDose = rawDose * reduction;
-                stdDisplay = `AUC ${target}`;
-                if(gfr > 125) note += '<br><span style="font-size:0.7em; color:orange;">(GFR cap 125)</span>';
-                doseDisplayHtml = finalDose.toFixed(0);
-            } else {
-                stdDisplay = `AUC ${target}`; 
-                finalDose = 0; 
-                note += '<br><span style="font-size:0.7em; color:#ef4444; font-weight:bold;">⚠️ กรอก Age และ Scr</span>';
-                doseDisplayHtml = '-';
-            }
-
+                let capped = Math.min(gfr, 125); finalDose = targetAUC * (capped + 25) * reduction;
+                stdDisplay = `AUC ${targetAUC}`; if(gfr > 125) note += '<br><small>(Cap 125)</small>';
+            } else { note += '<br><small class="text-danger">Need Scr</small>'; }
+            doseHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
         } else if (drug.type === 'weight') {
-            // --- คำนวณแบบ mg/kg ---
-            let rawDose = (drug.dose_kg || 0) * w;
-            finalDose = rawDose * reduction;
-            stdDisplay = `${drug.dose_kg} mg/kg`;
-            doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
-
+            finalDose = drug.dose_kg * w * reduction; stdDisplay = `${drug.dose_kg} mg/kg`; doseHtml = finalDose.toFixed(0);
         } else {
-            // --- คำนวณแบบ BSA ปกติ ---
-            let doseM2 = drug.dose_m2 || 0;
-            let rawDose = doseM2 * bsa;
-            finalDose = rawDose * reduction;
-            stdDisplay = `${doseM2}`;
-            
-            if (drug.max_dose && finalDose > drug.max_dose) { finalDose = drug.max_dose; }
-            doseDisplayHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
+            finalDose = drug.dose_m2 * bsa * reduction; stdDisplay = drug.dose_m2;
+            if (drug.max_dose && finalDose > drug.max_dose) finalDose = drug.max_dose;
+            doseHtml = finalDose.toFixed(0);
         }
-        
-        // ใช้ currentReducPercent แทน masterReducPercent
-        html += `<tr><td>${drug.name}<br><span style="font-size:0.75em; color:var(--text-muted)">${note}</span></td><td style="color:#94a3b8">${stdDisplay}</td><td class="dose-value">${doseDisplayHtml}</td><td style="color:#ec4899">${currentReducPercent}%</td></tr>`;
+        html += `<tr><td>${drug.name}<br><small class="text-muted">${note}</small></td><td>${stdDisplay}</td><td class="dose-value">${doseHtml}</td><td>${currentReduc}%</td></tr>`;
     });
-    
-    html += "</tbody></table>"; 
-    document.getElementById("resultMultiDose").innerHTML = html;
+    document.getElementById("resultMultiDose").innerHTML = html + "</tbody></table>";
 }
-function updateVisitorCount() { let count = parseInt(localStorage.getItem('visitorCount') || '0'); count++; localStorage.setItem('visitorCount', count); }
-window.onload = function() { updateVisitorCount(); loadAllRegimens(); calculateChemoDose(); }
-document.addEventListener('DOMContentLoaded', function() { 
-    const button = document.querySelector('.calculate-button'); 
-    if (button) { button.addEventListener('touchstart', function() { this.style.transform = 'scale(0.96)'; }); button.addEventListener('touchend', function() { this.style.transform = 'scale(1)'; }); } 
-});
-</script>
 
+window.onload = function() { loadAllRegimens(); calculateChemoDose(); }
+</script>
 </body>
 </html>
