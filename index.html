@@ -45,7 +45,6 @@
             min-height: 100vh;
             display: flex; flex-direction: column;
             overflow-x: hidden;
-            padding-bottom: constant(safe-area-inset-bottom);
             padding-bottom: env(safe-area-inset-bottom);
         }
 
@@ -68,7 +67,6 @@
             margin: 0; font-size: 1.5rem; font-weight: 700;
             background: linear-gradient(to right, #22d3ee, #818cf8);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
         }
         
         .app-header .subtitle { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1px; margin-top: 5px; text-transform: uppercase; }
@@ -88,115 +86,81 @@
         }
 
         .input-group { margin-bottom: 20px; }
-        .input-group:last-child { margin-bottom: 0; }
-
-        label {
-            display: block; font-weight: 500; color: var(--neon-blue);
-            margin-bottom: 8px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        label { display: block; font-weight: 500; color: var(--neon-blue); margin-bottom: 8px; font-size: 0.85rem; text-transform: uppercase; }
 
         input, select {
             width: 100%; padding: 14px;
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #334155; border-radius: 12px;
-            font-size: 1.1rem; font-family: "Prompt", sans-serif;
-            color: white; transition: all 0.3s ease;
-        }
-
-        input:focus, select:focus {
-            outline: none; border-color: var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-glow); background: rgba(15, 23, 42, 0.9);
+            font-size: 1.1rem; color: white;
         }
 
         .row-group { display: flex; gap: 15px; margin-bottom: 20px; }
         .row-group > div { flex: 1; }
 
         .bsa-result {
-            margin-top: 15px;
-            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(0,0,0,0));
-            border: 1px solid var(--neon-pink);
-            color: white; padding: 20px;
+            margin-top: 15px; background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(0,0,0,0));
+            border: 1px solid var(--neon-pink); color: white; padding: 20px;
             border-radius: 16px; text-align: center;
-            box-shadow: 0 0 20px rgba(236, 72, 153, 0.2);
-            position: relative; overflow: hidden;
         }
-
         .bsa-value { font-size: 2.2rem; font-weight: 700; text-shadow: 0 0 10px var(--neon-pink); }
 
         .calculate-button {
-            width: 100%; padding: 16px;
-            font-size: 1.2rem; border: none; border-radius: 12px;
+            width: 100%; padding: 16px; font-size: 1.1rem; border: none; border-radius: 12px;
             background: linear-gradient(90deg, var(--neon-blue), #3b82f6);
-            color: #0f172a; cursor: pointer;
-            font-weight: 700; font-family: "Prompt", sans-serif;
+            color: #0f172a; cursor: pointer; font-weight: 700;
             box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
-            transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
         }
 
+        /* Result Styles - สไตล์เดิมที่สวยงาม */
         .result-box {
             background: rgba(15, 23, 42, 0.8); padding: 20px;
-            border-radius: 16px; border: 1px solid var(--border-glass); position: relative;
+            border-radius: 16px; border: 1px solid var(--border-glass);
         }
+        .result-header { font-weight: 600; color: var(--neon-blue); font-size: 1.1rem; margin-bottom: 15px; text-align: center; text-transform: uppercase; }
 
         .result-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        .result-table th { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; padding: 0 10px; font-weight: 500; text-align: center; }
+        .result-table th { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; padding: 0 10px; text-align: center; }
         .result-table td {
             background: rgba(255, 255, 255, 0.03); padding: 15px 10px; text-align: center;
             border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        
-        /* การจัดกึ่งกลางคอลัมน์ชื่อยา (ชิดซ้ายเพื่อความชัดเจน) */
         .result-table tr td:first-child { 
-            border-left: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 10px 0 0 10px; font-weight: 600; color: white; text-align: left; padding-left: 15px; 
-        }
-
-        /* คอลัมน์ Dose และ % จัดกลางทั้งหมด */
-        .dose-value { 
-            color: var(--neon-blue); font-weight: 700; font-size: 1.1rem; 
-            text-shadow: 0 0 8px rgba(6, 182, 212, 0.3); text-align: center !important; 
+            border-left: 1px solid rgba(255,255,255,0.05); border-radius: 10px 0 0 10px; 
+            font-weight: 600; color: white; text-align: left; padding-left: 15px; 
         }
         .result-table tr td:last-child { 
-            border-right: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 0 10px 10px 0; color: var(--text-muted); text-align: center; 
+            border-right: 1px solid rgba(255,255,255,0.05); border-radius: 0 10px 10px 0; 
+            color: var(--neon-pink); font-weight: 500;
         }
+        .dose-value { color: var(--neon-blue); font-weight: 700; font-size: 1.3rem; text-shadow: 0 0 8px rgba(6, 182, 212, 0.3); }
 
         .handbook-btn {
             background: rgba(6, 182, 212, 0.1); border: 1px dashed var(--neon-blue);
-            color: var(--neon-blue); margin-bottom: 15px; padding: 10px; font-size: 0.9rem;
-            width: 100%; border-radius: 50px; cursor: pointer; transition: all 0.3s;
+            color: var(--neon-blue); margin-bottom: 20px; padding: 12px; font-size: 0.9rem;
+            width: 100%; border-radius: 50px; cursor: pointer; transition: 0.3s;
         }
-        .handbook-btn:hover { background: rgba(6, 182, 212, 0.2); }
 
+        .visitor-counter { text-align: center; padding: 25px; color: var(--text-muted); font-size: 0.75rem; line-height: 1.6; }
         .modal-content { background: #0f172a; color: white; border: 1px solid var(--border-glass); }
-        .modal-header { border-bottom: 1px solid var(--border-glass); }
         .btn-close { filter: invert(1); }
     </style>
 </head>
 <body>
 
 <div class="app-header">
-    <h1>🧪เครื่องคำนวณยาเคมีบำบัด<span style="font-weight:300"></span></h1>
+    <h1>🧪 เครื่องคำนวณยาเคมีบำบัด</h1>
     <div class="subtitle">Chemotherapy Dose Calculator</div>
 </div>
 
 <div class="calculator-container">
     <button class="handbook-btn" data-bs-toggle="modal" data-bs-target="#handbookModal">📘 คู่มือการใช้งาน (Handbook)</button>
-    
-    <button id="installBtn" class="btn w-100 rounded-pill mb-3" style="display:none; background: rgba(255,255,255,0.1); border: 1px solid var(--neon-blue); color: var(--neon-blue);" onclick="installPWA()">📲 INSTALL APP</button>
 
     <div class="card">
         <div class="row-group">
-            <div>
-                <label>📏 Height (cm)</label>
-                <input type="number" id="height" min="1" max="250" oninput="calculateChemoDose()" placeholder="cm">
-            </div>
-            <div>
-                <label>⚖️ Weight (kg)</label>
-                <input type="number" id="weight" min="1" max="300" oninput="calculateChemoDose()" placeholder="kg">
-            </div>
+            <div><label>📏 Height (cm)</label><input type="number" id="height" oninput="calculateChemoDose()" placeholder="cm"></div>
+            <div><label>⚖️ Weight (kg)</label><input type="number" id="weight" oninput="calculateChemoDose()" placeholder="kg"></div>
         </div>
-
         <div class="row-group">
             <div>
                 <label>⚧ Sex</label>
@@ -205,20 +169,15 @@
                     <option value="female">Female</option>
                 </select>
             </div>
-            <div>
-                <label>🎂 Age (Yr)</label>
-                <input type="number" id="age" min="1" max="120" oninput="calculateChemoDose()" placeholder="Years">
-            </div>
+            <div><label>🎂 Age (Yr)</label><input type="number" id="age" oninput="calculateChemoDose()" placeholder="Years"></div>
         </div>
-
         <div class="input-group">
             <label>🧪 Serum Creatinine (mg/dL)</label>
-            <input type="number" id="scr" step="0.01" min="0.1" oninput="calculateChemoDose()" placeholder="For Carboplatin">
+            <input type="number" id="scr" step="0.01" oninput="calculateChemoDose()" placeholder="For Carboplatin">
             <div id="gfrDisplay" style="font-size: 0.8rem; color: #4ade80; text-align: right; margin-top: 5px; min-height: 18px;"></div>
         </div>
-
         <div class="bsa-result">
-            <div class="bsa-label">BODY SURFACE AREA</div>
+            <div style="font-size:0.75rem; letter-spacing:1px; color:#fbcfe8;">BODY SURFACE AREA</div>
             <div class="bsa-value" id="resultBSA">0.00 <span style="font-size:1rem; opacity:0.7">m²</span></div>
         </div>
     </div>
@@ -230,183 +189,97 @@
                 <option value="">-- SELECT REGIMEN --</option>
             </select>
         </div>
-
         <div class="input-group" id="aucContainer" style="display:none;">
             <label>🎯 Target AUC</label>
-            <select id="targetAUC" onchange="calculateChemoDose()" style="border-color: var(--neon-pink);">
-                <option value="4">AUC 4</option>
-                <option value="4.5">AUC 4.5</option>
-                <option value="5" selected>AUC 5 (Standard)</option>
-                <option value="5.5">AUC 5.5</option>
-                <option value="6">AUC 6 (High)</option>
-                <option value="7">AUC 7</option>
+            <select id="targetAUC" onchange="calculateChemoDose()">
+                <option value="4">AUC 4</option><option value="4.5">AUC 4.5</option><option value="5" selected>AUC 5</option>
+                <option value="5.5">AUC 5.5</option><option value="6">AUC 6</option><option value="7">AUC 7</option>
             </select>
         </div>
-
         <div class="input-group">
             <label>📉 Dose Adjustment</label>
             <select id="doseReduction" onchange="calculateChemoDose()">
                 <option value="1">Standard Dose (100%)</option>
-                <option value="0.95">Reduce 5%</option>
-                <option value="0.90">Reduce 10%</option>
-                <option value="0.85">Reduce 15%</option>
-                <option value="0.80">Reduce 20%</option>
-                <option value="0.75">Reduce 25%</option>
-                <option value="0.70">Reduce 30%</option>
+                <option value="0.95">Reduce 5%</option><option value="0.90">Reduce 10%</option>
+                <option value="0.85">Reduce 15%</option><option value="0.80">Reduce 20%</option>
+                <option value="0.75">Reduce 25%</option><option value="0.70">Reduce 30%</option>
             </select>
         </div>
-
         <button class="calculate-button" onclick="calculateChemoDose()">INITIATE CALCULATION</button>
     </div>
 
     <div class="result-box">
         <div class="result-header">📊 Calculation Output</div>
-        <div class="result-table" id="resultMultiDose">
-            <div class="placeholder-text">WAITING FOR INPUT DATA...</div>
-        </div>
+        <div id="resultMultiDose"><div class="placeholder-text">WAITING FOR INPUT...</div></div>
     </div>
 
     <div class="visitor-counter">
-        <a href="https://www.freecounterstat.com" title="free website counter"><img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=xa9gdz9egktyd3aud1qybnrpn5zyj3s4" border="0" title="free website counter" alt="free website counter"></a>
-        <br> ผู้ตรวจสอบเครื่องมือ : พญ.ชลิตา ละกำปั่น
-        <br> DEVELOPED BY: พว.วิษณุกรณ์ โอยา รพ.ชลบุรี
+        <a href="https://www.freecounterstat.com"><img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=xa9gdz9egktyd3aud1qybnrpn5zyj3s4" border="0"></a>
+        <br>ผู้ตรวจสอบเครื่องมือ : พญ.ชลิตา ละกำปั่น<br>DEVELOPED BY: พว.วิษณุกรณ์ โอยา รพ.ชลบุรี
     </div>
 </div>
 
 <div class="modal fade" id="handbookModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-info">📘 Handbook & Guide</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img src="handbook_CDC.png" alt="Handbook CDC" class="img-fluid rounded border">
-            </div>
-        </div>
+        <div class="modal-content"><div class="modal-header"><h5>📘 Handbook</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body text-center"><img src="handbook_CDC.png" class="img-fluid rounded shadow"></div></div>
     </div>
 </div>
 
 <script>
-// PWA Logic
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW failed', err));
-    });
-}
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); deferredPrompt = e;
-    document.getElementById('installBtn').style.display = 'block';
-});
-async function installPWA() {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') { document.getElementById('installBtn').style.display = 'none'; }
-        deferredPrompt = null;
-    }
-}
-
 const DEFAULT_REGIMENS = {
     'mFOLFOX-6': [{ name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
     'mFOLFOX-6+Avastin': [{ name: 'Avastin', type: 'weight', dose_kg: 5 }, { name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
     'mFOLFIRI': [{ name: 'Irinotecan', dose_m2: 180 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
-    'mFOLFIRI+Avastin': [{ name: 'Avastin', type: 'weight', dose_kg: 5 }, { name: 'Irinotecan', dose_m2: 180 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
-    'de Gramont': [{ name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 600 }],
-    'Mayo\'s 5FU': [{ name: 'Leucovorin', dose_m2: 20 }, { name: '5-FU Bolus', dose_m2: 375 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Bolus', dose_m2: 425 }],
+    'XELOX': [{ name: 'Oxaliplatin', dose_m2: 130 }, { name: 'Capecitabine(500)', dose_m2: 2000, type: 'capecitabine_special', note: '(oral pc เช้า-เย็น 14 วัน)' }],
     'Carboplatin + Etoposide': [{ name: 'Etoposide', dose_m2: 100 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }],
-    'Carboplatin + 5-Fu': [{ name: '5-FU', dose_m2: 1000 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }],
-    'Cisplatin + 5-Fu': [{ name: '5-FU', dose_m2: 1000 }, { name: 'Cisplatin', dose_m2: 75 }, { name: 'Cisplatin', dose_m2: 100 }],
-    'XELOX': [{ name: 'Oxaliplatin', dose_m2: 130, type: 'iv' }, { name: 'Capecitabine(500)', dose_m2: 2000, note: '(oral pc เช้า-เย็น 14 วัน)', type: 'capecitabine_special' }],
-    'AC Regimen': [{ name: 'Doxorubicin', dose_m2: 60 }, { name: 'Cyclophosphamide', dose_m2: 600 }],
-    'Paclitaxel (Weekly)': [{ name: 'Paclitaxel', dose_m2: 80 }],
-    'Paclitaxel + Carboplatin': [{ name: 'Paclitaxel', dose_m2: 175 }, { name: 'Paclitaxel', dose_m2: 225 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }],
-    'TIP': [{ name: 'Paclitaxel', dose_m2: 175 }, { name: 'Paclitaxel', dose_m2: 225 }, { name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1500 }, { name: 'Cisplatin', dose_m2: 25 }],
-    'Ifosfamide+Etoposide': [{ name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1500 }, { name: 'Etoposide', dose_m2: 80 }],
     'BEP': [{ name: 'Cisplatin', dose_m2: 20 }, { name: 'Carboplatin', type: 'auc', target_auc: 6 }, { name: 'Etoposide', dose_m2: 80 }, { name: 'Bleomycin', type: 'fixed', dose_fixed: 30, note: '(Max 30 mg)' }],
-    'VIP': [{ name: 'Cisplatin', dose_m2: 20 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }, { name: 'Etoposide', dose_m2: 75 }, { name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1200 }],
+    'AC Regimen': [{ name: 'Doxorubicin', dose_m2: 60 }, { name: 'Cyclophosphamide', dose_m2: 600 }],
     'R-CHOP': [{ name: 'Rituximab', dose_m2: 375 }, { name: 'Cyclophosphamide', dose_m2: 750 }, { name: 'Doxorubicin', dose_m2: 50 }, { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 }]
 };
-
-function loadAllRegimens() {
-    const select = document.getElementById('drugProtocol');
-    Object.keys(DEFAULT_REGIMENS).forEach(key => {
-        const option = document.createElement('option'); option.value = key; option.textContent = key; select.appendChild(option);
-    });
-}
 
 function calculateBSA(h, w) { return Math.sqrt((h * w) / 3600); }
 function calculateGFR(age, weight, gender, scr) {
     if(!age || !weight || !scr || scr <= 0) return 0;
     let gfr = ((140 - age) * weight) / (72 * scr);
-    if(gender === 'female') { gfr = gfr * 0.85; }
-    return gfr;
+    return gender === 'female' ? gfr * 0.85 : gfr;
 }
 
 function calculateChemoDose() {
-    let h = parseFloat(document.getElementById("height").value) || 0;
-    let w = parseFloat(document.getElementById("weight").value) || 0;
-    let age = parseFloat(document.getElementById("age").value) || 0;
-    let scr = parseFloat(document.getElementById("scr").value) || 0;
-    let gender = document.getElementById("gender").value;
-    let protocol = document.getElementById("drugProtocol").value;
-    let reduction = parseFloat(document.getElementById("doseReduction").value);
+    let h = parseFloat($('#height').val()), w = parseFloat($('#weight').val()), age = parseFloat($('#age').val()), scr = parseFloat($('#scr').val());
+    let gender = $('#gender').val(), protocol = $('#drugProtocol').val(), reduction = parseFloat($('#doseReduction').val());
+    let gfr = calculateGFR(age, w, gender, scr), bsa = calculateBSA(h, w);
     
-    let gfr = calculateGFR(age, w, gender, scr);
-    document.getElementById("gfrDisplay").innerHTML = (gfr > 0) ? `Est. CrCl: <b>${gfr.toFixed(1)}</b> ml/min` : '<span style="color:#ec4899; font-size:0.9em;">(รอค่า Scr/Age)</span>';
+    $('#gfrDisplay').html(gfr > 0 ? `Est. CrCl: <b>${gfr.toFixed(1)}</b> ml/min` : '<span style="color:#ec4899;">(รอค่า Scr/Age)</span>');
+    if (!h || !w) { $('#resultBSA').html('0.00 <small>m²</small>'); $('#resultMultiDose').html('<div class="placeholder-text">WAITING FOR INPUT...</div>'); return; }
+    $('#resultBSA').html(bsa.toFixed(2) + ' <small>m²</small>');
 
-    if (!h || !w) {
-        document.getElementById("resultBSA").innerHTML = '0.00 <span style="font-size:1rem; opacity:0.7">m²</span>';
-        document.getElementById("resultMultiDose").innerHTML = '<div class="placeholder-text">WAITING FOR INPUT...</div>';
-        return;
-    }
-    let bsa = calculateBSA(h, w);
-    document.getElementById("resultBSA").innerHTML = bsa.toFixed(2) + ' <span style="font-size:1rem; opacity:0.7">m²</span>';
-
-    if (!protocol) {
-        document.getElementById("resultMultiDose").innerHTML = '<div class="placeholder-text">SELECT REGIMEN</div>';
-        document.getElementById("aucContainer").style.display = "none";
-        return;
-    }
-
-    let drugs = DEFAULT_REGIMENS[protocol];
-    document.getElementById("aucContainer").style.display = drugs.some(d => d.type === 'auc') ? "block" : "none";
+    if (!protocol) { $('#resultMultiDose').html('<div class="placeholder-text">SELECT REGIMEN</div>'); $('#aucContainer').hide(); return; }
+    let drugs = DEFAULT_REGIMENS[protocol]; $('#aucContainer').toggle(drugs.some(d => d.type === 'auc'));
     
-    let targetAUC = parseFloat(document.getElementById("targetAUC").value);
-    let reducPercent = ((1 - reduction) * 100).toFixed(0);
-
     let html = `<table class="result-table"><thead><tr><th>DRUG</th><th>STD</th><th>DOSE (mg)</th><th>-%</th></tr></thead><tbody>`;
-    
     drugs.forEach(drug => {
-        let finalDose = 0; let stdDisplay = '-'; let note = drug.note || ''; let doseHtml = ''; let currentReduc = reducPercent;
-        
+        let dose = 0, std = drug.dose_m2 || '-', note = drug.note || '', reducTxt = `${((1-reduction)*100).toFixed(0)}%`;
         if (drug.type === 'capecitabine_special') {
-            stdDisplay = `${drug.dose_m2}`;
-            let dailyTab = Math.floor((bsa * drug.dose_m2 * reduction) / 500);
-            let eve = Math.floor(dailyTab / 2); let morn = dailyTab - eve;
-            doseHtml = `<div class="text-center"><span style="font-size:0.9em">${morn}-0-${eve}</span><br><span style="font-size:0.7em; opacity:0.7">(${dailyTab*14} tab)</span></div>`;
-        } else if (drug.type === 'fixed') {
-            finalDose = drug.dose_fixed; currentReduc = 0; stdDisplay = `${drug.dose_fixed} mg`; doseHtml = finalDose.toFixed(0);
+            let total = Math.floor((bsa * drug.dose_m2 * reduction) / 500), eve = Math.floor(total/2), morn = total - eve;
+            dose = `<div style="line-height:1.2"><b>${morn}-0-${eve}</b><br><small style="font-size:0.65em; opacity:0.7">(${total*14} tab)</small></div>`;
+        } else if (drug.type === 'fixed') { dose = drug.dose_fixed; std = `${drug.dose_fixed} mg`; reducTxt = '0%';
         } else if (drug.type === 'auc') {
-            if(gfr > 0) {
-                let capped = Math.min(gfr, 125); finalDose = targetAUC * (capped + 25) * reduction;
-                stdDisplay = `AUC ${targetAUC}`; if(gfr > 125) note += '<br><small>(Cap 125)</small>';
-            } else { note += '<br><small class="text-danger">Need Scr</small>'; }
-            doseHtml = finalDose > 0 ? finalDose.toFixed(0) : '-';
-        } else if (drug.type === 'weight') {
-            finalDose = drug.dose_kg * w * reduction; stdDisplay = `${drug.dose_kg} mg/kg`; doseHtml = finalDose.toFixed(0);
-        } else {
-            finalDose = drug.dose_m2 * bsa * reduction; stdDisplay = drug.dose_m2;
-            if (drug.max_dose && finalDose > drug.max_dose) finalDose = drug.max_dose;
-            doseHtml = finalDose.toFixed(0);
-        }
-        html += `<tr><td>${drug.name}<br><small class="text-muted">${note}</small></td><td>${stdDisplay}</td><td class="dose-value">${doseHtml}</td><td>${currentReduc}%</td></tr>`;
+            let auc = parseFloat($('#targetAUC').val()); std = `AUC ${auc}`;
+            if (gfr > 0) dose = (auc * (Math.min(gfr, 125) + 25) * reduction).toFixed(0);
+            else { dose = '-'; note = '<span class="text-danger">Need Scr</span>'; }
+        } else if (drug.type === 'weight') { dose = (drug.dose_kg * w * reduction).toFixed(0); std = `${drug.dose_kg} mg/kg`;
+        } else { dose = (drug.dose_m2 * bsa * reduction); if(drug.max_dose && dose > drug.max_dose) dose = drug.max_dose; dose = dose.toFixed(0); }
+        
+        html += `<tr><td>${drug.name}<br><small style="font-size:0.7em; color:var(--text-muted)">${note}</small></td><td style="color:var(--text-muted)">${std}</td><td class="dose-value">${dose}</td><td>${reducTxt}</td></tr>`;
     });
-    document.getElementById("resultMultiDose").innerHTML = html + "</tbody></table>";
+    $('#resultMultiDose').html(html + '</tbody></table>');
 }
 
-window.onload = function() { loadAllRegimens(); calculateChemoDose(); }
+$(() => { 
+    Object.keys(DEFAULT_REGIMENS).forEach(k => $('#drugProtocol').append(`<option value="${k}">${k}</option>`));
+    calculateChemoDose();
+});
 </script>
 </body>
 </html>
