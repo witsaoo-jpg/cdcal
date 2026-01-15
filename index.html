@@ -243,14 +243,125 @@
 
 <script>
 const DEFAULT_REGIMENS = {
-    'mFOLFOX-6': [{ name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
-    'mFOLFOX-6+Avastin': [{ name: 'Avastin', type: 'weight', dose_kg: 5 }, { name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
-    'mFOLFIRI': [{ name: 'Irinotecan', dose_m2: 180 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
-    'XELOX': [{ name: 'Oxaliplatin', dose_m2: 130 }, { name: 'Capecitabine(500)', dose_m2: 2000, type: 'capecitabine_special', note: '(oral pc เช้า-เย็น 14 วัน)' }],
-    'Carboplatin + Etoposide': [{ name: 'Etoposide', dose_m2: 100 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }],
-    'BEP': [{ name: 'Cisplatin', dose_m2: 20 }, { name: 'Carboplatin', type: 'auc', target_auc: 6 }, { name: 'Etoposide', dose_m2: 80 }, { name: 'Bleomycin', type: 'fixed', dose_fixed: 30, note: '(Max 30 mg)' }],
-    'AC Regimen': [{ name: 'Doxorubicin', dose_m2: 60 }, { name: 'Cyclophosphamide', dose_m2: 600 }],
-    'R-CHOP': [{ name: 'Rituximab', dose_m2: 375 }, { name: 'Cyclophosphamide', dose_m2: 750 }, { name: 'Doxorubicin', dose_m2: 50 }, { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 }]
+    // --- กลุ่มมะเร็งลำไส้ (Colorectal) ---
+    'mFOLFOX-6': [
+        { name: 'Oxaliplatin', dose_m2: 85 }, 
+        { name: 'Leucovorin', dose_m2: 200 }, 
+        { name: '5-FU Bolus', dose_m2: 400 }, 
+        { name: '5-FU Infusion', dose_m2: 1200 }
+    ],
+    'mFOLFOX-6+Avastin': [
+        { name: 'Avastin', type: 'weight', dose_kg: 5 }, 
+        { name: 'Oxaliplatin', dose_m2: 85 }, 
+        { name: 'Leucovorin', dose_m2: 200 }, 
+        { name: '5-FU Bolus', dose_m2: 400 }, 
+        { name: '5-FU Infusion', dose_m2: 1200 }
+    ],
+    'mFOLFIRI': [
+        { name: 'Irinotecan', dose_m2: 180 }, 
+        { name: 'Leucovorin', dose_m2: 200 }, 
+        { name: '5-FU Bolus', dose_m2: 400 }, 
+        { name: '5-FU Infusion', dose_m2: 1200 }
+    ],
+    'mFOLFIRI+Avastin': [
+        { name: 'Avastin', type: 'weight', dose_kg: 5 },
+        { name: 'Irinotecan', dose_m2: 180 }, 
+        { name: 'Leucovorin', dose_m2: 200 }, 
+        { name: '5-FU Bolus', dose_m2: 400 }, 
+        { name: '5-FU Infusion', dose_m2: 1200 }
+    ],
+    'de Gramont': [
+        { name: 'Leucovorin', dose_m2: 200 }, 
+        { name: '5-FU Bolus', dose_m2: 400 }, 
+        { name: '5-FU Infusion', dose_m2: 600 }
+    ],
+    'Mayo\'s 5FU': [
+        { name: 'Leucovorin', dose_m2: 20 }, 
+        { name: '5-FU Bolus', dose_m2: 375 }, 
+        { name: '5-FU Bolus', dose_m2: 400 }, 
+        { name: '5-FU Bolus', dose_m2: 425 } 
+    ],
+    'Carboplatin + Etoposide': [
+        { name: 'Etoposide', dose_m2: 100 },
+        { name: 'Carboplatin', type: 'auc', target_auc: 5 }
+    ],
+    'Carboplatin + 5-Fu': [
+        { name: '5-FU', dose_m2: 1000 },
+        { name: 'Carboplatin', type: 'auc', target_auc: 5 }
+    ],
+    'Cisplatin + 5-Fu': [
+        { name: '5-FU', dose_m2: 1000 },
+        { name: 'Cisplatin', dose_m2: 75 },
+        { name: 'Cisplatin', dose_m2: 100 }
+    ],
+    'XELOX': [
+        { 
+            name: 'Oxaliplatin', 
+            dose_m2: 130, 
+            unit: 'mg',
+            type: 'iv' 
+        }, 
+        { 
+            name: 'Capecitabine(500)', 
+            dose_m2: 2000, 
+            unit: 'tab',
+            note: '(oral pc เช้า-เย็น 14 วัน)',
+            type: 'capecitabine_special' 
+        }
+    ],
+
+    // --- กลุ่มมะเร็งเต้านม (Breast) ---
+    'AC Regimen': [
+        { name: 'Doxorubicin', dose_m2: 60 },
+        { name: 'Cyclophosphamide', dose_m2: 600 }
+    ],
+    'Paclitaxel (Weekly)': [
+        { name: 'Paclitaxel', dose_m2: 80 }
+    ],
+
+    // --- กลุ่มมะเร็งปอด (Lung) & อื่นๆ ที่ใช้ Carboplatin ---
+    'Paclitaxel + Carboplatin': [
+        { name: 'Paclitaxel', dose_m2: 175 },
+        { name: 'Paclitaxel', dose_m2: 225 },
+        { name: 'Carboplatin', type: 'auc', target_auc: 5 } 
+    ],
+    'TIP': [
+        { name: 'Paclitaxel', dose_m2: 175 },
+        { name: 'Paclitaxel', dose_m2: 225 },
+        { name: 'Mesna', dose_m2: 300 },
+        { name: 'Ifosfamide', dose_m2: 1500 },
+        { name: 'Cisplatin', dose_m2: 25 }
+    ],
+    'Ifosfamide+Etoposide': [
+        { name: 'Mesna', dose_m2: 300 },
+        { name: 'Ifosfamide', dose_m2: 1500 },
+        { name: 'Etoposide', dose_m2: 80 }
+    ],
+    'BEP': [
+        { name: 'Cisplatin', dose_m2: 20 },
+        { name: 'Carboplatin', type: 'auc', target_auc: 6 }, 
+        { name: 'Etoposide', dose_m2: 80 },
+        { 
+            name: 'Bleomycin', 
+            type: 'fixed', 
+            dose_fixed: 30, 
+            note: '(Max 30 mg)' 
+        }
+    ],
+    'VIP': [
+        { name: 'Cisplatin', dose_m2: 20 },
+        { name: 'Carboplatin', type: 'auc', target_auc: 5 }, 
+        { name: 'Etoposide', dose_m2: 75 },
+        { name: 'Mesna', dose_m2: 300 },
+        { name: 'Ifosfamide', dose_m2: 1200 }
+    ],        
+    // --- กลุ่มมะเร็งต่อมน้ำเหลือง (Lymphoma) ---
+    'R-CHOP': [
+        { name: 'Rituximab', dose_m2: 375 },
+        { name: 'Cyclophosphamide', dose_m2: 750 },
+        { name: 'Doxorubicin', dose_m2: 50 },
+        { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 } 
+    ]
 };
 
 function calculateBSA(h, w) { return Math.sqrt((h * w) / 3600); }
