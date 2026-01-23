@@ -65,14 +65,14 @@
         .app-header .subtitle { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px; margin-top: 3px; text-transform: uppercase; }
 
         .calculator-container {
-            flex: 1; padding: 20px 10px; /* ลด padding จอ */
+            flex: 1; padding: 20px 10px;
             max-width: 600px; width: 100%; margin: 0 auto;
         }
 
         .card {
             background: var(--card-glass);
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            padding: 20px 15px; /* ลด padding card */
+            padding: 20px 15px;
             border-radius: 16px;
             border: 1px solid var(--border-glass);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
@@ -83,7 +83,7 @@
         label { display: block; font-weight: 500; color: var(--neon-blue); margin-bottom: 5px; font-size: 0.8rem; text-transform: uppercase; }
 
         input, select {
-            width: 100%; padding: 10px 12px; /* ลดขนาด input */
+            width: 100%; padding: 10px 12px;
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #334155; border-radius: 8px;
             font-size: 1rem; color: white;
@@ -106,48 +106,27 @@
             box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
         }
 
-        /* --- Compact Result Styles (ปรับใหม่หมด) --- */
         .result-box {
             background: rgba(15, 23, 42, 0.9); padding: 15px 10px;
             border-radius: 12px; border: 1px solid var(--border-glass);
         }
         .result-header { font-weight: 600; color: var(--neon-blue); font-size: 1rem; margin-bottom: 10px; text-align: left; text-transform: uppercase; padding-left: 5px; }
 
-        .result-table { width: 100%; border-collapse: collapse; } /* ลบช่องว่างตารางทิ้ง */
-        
-        /* ปรับหัวตาราง */
+        .result-table { width: 100%; border-collapse: collapse; }
         .result-table th { 
             color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; 
             padding: 5px 4px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        
-        /* ปรับเนื้อหาตาราง */
         .result-table td {
-            padding: 8px 4px; /* บีบ Padding */
-            text-align: left; /* ชิดซ้ายทั้งหมด */
-            font-size: 0.8rem; /* ลดขนาดตัวหนังสือ */
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            vertical-align: top; /* จัดชิดบน */
+            padding: 8px 4px; text-align: left; font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: top;
         }
-
-        /* คอลัมน์ชื่อยา */
-        .result-table tr td:first-child { 
-            font-weight: 600; color: white; width: 40%;
-        }
-        
-        /* คอลัมน์ Dose (ตัวเลข) */
+        .result-table tr td:first-child { font-weight: 600; color: white; width: 40%; }
         .dose-value { 
-            color: var(--neon-blue); font-weight: 700; 
-            font-size: 0.95rem; /* ตัวเลขใหญ่กว่านิดนึงแต่อยู่ในเกณฑ์เล็ก */
-            text-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
-            text-align: left !important; /* บังคับชิดซ้าย */
-            white-space: nowrap; /* ไม่ให้ตัวเลขตกบรรทัด */
+            color: var(--neon-blue); font-weight: 700; font-size: 0.95rem; 
+            text-shadow: 0 0 5px rgba(6, 182, 212, 0.3); text-align: left !important; white-space: nowrap; 
         }
-
-        /* คอลัมน์ % */
-        .result-table tr td:last-child { 
-            color: var(--neon-pink); font-size: 0.75rem; 
-        }
+        .result-table tr td:last-child { color: var(--neon-pink); font-size: 0.75rem; }
 
         .handbook-btn {
             background: rgba(6, 182, 212, 0.1); border: 1px dashed var(--neon-blue);
@@ -243,125 +222,24 @@
 
 <script>
 const DEFAULT_REGIMENS = {
-    // --- กลุ่มมะเร็งลำไส้ (Colorectal) ---
-    'mFOLFOX-6': [
-        { name: 'Oxaliplatin', dose_m2: 85 }, 
-        { name: 'Leucovorin', dose_m2: 200 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Infusion', dose_m2: 1200 }
-    ],
-    'mFOLFOX-6+Avastin': [
-        { name: 'Avastin', type: 'weight', dose_kg: 5 }, 
-        { name: 'Oxaliplatin', dose_m2: 85 }, 
-        { name: 'Leucovorin', dose_m2: 200 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Infusion', dose_m2: 1200 }
-    ],
-    'mFOLFIRI': [
-        { name: 'Irinotecan', dose_m2: 180 }, 
-        { name: 'Leucovorin', dose_m2: 200 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Infusion', dose_m2: 1200 }
-    ],
-    'mFOLFIRI+Avastin': [
-        { name: 'Avastin', type: 'weight', dose_kg: 5 },
-        { name: 'Irinotecan', dose_m2: 180 }, 
-        { name: 'Leucovorin', dose_m2: 200 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Infusion', dose_m2: 1200 }
-    ],
-    'de Gramont': [
-        { name: 'Leucovorin', dose_m2: 200 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Infusion', dose_m2: 600 }
-    ],
-    'Mayo\'s 5FU': [
-        { name: 'Leucovorin', dose_m2: 20 }, 
-        { name: '5-FU Bolus', dose_m2: 375 }, 
-        { name: '5-FU Bolus', dose_m2: 400 }, 
-        { name: '5-FU Bolus', dose_m2: 425 } 
-    ],
-    'Carboplatin + Etoposide': [
-        { name: 'Etoposide', dose_m2: 100 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 }
-    ],
-    'Carboplatin + 5-Fu': [
-        { name: '5-FU', dose_m2: 1000 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 }
-    ],
-    'Cisplatin + 5-Fu': [
-        { name: '5-FU', dose_m2: 1000 },
-        { name: 'Cisplatin', dose_m2: 75 },
-        { name: 'Cisplatin', dose_m2: 100 }
-    ],
-    'XELOX': [
-        { 
-            name: 'Oxaliplatin', 
-            dose_m2: 130, 
-            unit: 'mg',
-            type: 'iv' 
-        }, 
-        { 
-            name: 'Capecitabine(500)', 
-            dose_m2: 2000, 
-            unit: 'tab',
-            note: '(oral pc เช้า-เย็น 14 วัน)',
-            type: 'capecitabine_special' 
-        }
-    ],
-
-    // --- กลุ่มมะเร็งเต้านม (Breast) ---
-    'AC Regimen': [
-        { name: 'Doxorubicin', dose_m2: 60 },
-        { name: 'Cyclophosphamide', dose_m2: 600 }
-    ],
-    'Paclitaxel (Weekly)': [
-        { name: 'Paclitaxel', dose_m2: 80 }
-    ],
-
-    // --- กลุ่มมะเร็งปอด (Lung) & อื่นๆ ที่ใช้ Carboplatin ---
-    'Paclitaxel + Carboplatin': [
-        { name: 'Paclitaxel', dose_m2: 175 },
-        { name: 'Paclitaxel', dose_m2: 225 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 } 
-    ],
-    'TIP': [
-        { name: 'Paclitaxel', dose_m2: 175 },
-        { name: 'Paclitaxel', dose_m2: 225 },
-        { name: 'Mesna', dose_m2: 300 },
-        { name: 'Ifosfamide', dose_m2: 1500 },
-        { name: 'Cisplatin', dose_m2: 25 }
-    ],
-    'Ifosfamide+Etoposide': [
-        { name: 'Mesna', dose_m2: 300 },
-        { name: 'Ifosfamide', dose_m2: 1500 },
-        { name: 'Etoposide', dose_m2: 80 }
-    ],
-    'BEP': [
-        { name: 'Cisplatin', dose_m2: 20 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 6 }, 
-        { name: 'Etoposide', dose_m2: 80 },
-        { 
-            name: 'Bleomycin', 
-            type: 'fixed', 
-            dose_fixed: 30, 
-            note: '(Max 30 mg)' 
-        }
-    ],
-    'VIP': [
-        { name: 'Cisplatin', dose_m2: 20 },
-        { name: 'Carboplatin', type: 'auc', target_auc: 5 }, 
-        { name: 'Etoposide', dose_m2: 75 },
-        { name: 'Mesna', dose_m2: 300 },
-        { name: 'Ifosfamide', dose_m2: 1200 }
-    ],        
-    // --- กลุ่มมะเร็งต่อมน้ำเหลือง (Lymphoma) ---
-    'R-CHOP': [
-        { name: 'Rituximab', dose_m2: 375 },
-        { name: 'Cyclophosphamide', dose_m2: 750 },
-        { name: 'Doxorubicin', dose_m2: 50 },
-        { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 } 
-    ]
+    'mFOLFOX-6': [{ name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
+    'mFOLFOX-6+Avastin': [{ name: 'Avastin', type: 'weight', dose_kg: 5 }, { name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
+    'mFOLFIRI': [{ name: 'Irinotecan', dose_m2: 180 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
+    'mFOLFIRI+Avastin': [{ name: 'Avastin', type: 'weight', dose_kg: 5 }, { name: 'Irinotecan', dose_m2: 180 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
+    'de Gramont': [{ name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 600 }],
+    'Mayo\'s 5FU': [{ name: 'Leucovorin', dose_m2: 20 }, { name: '5-FU Bolus', dose_m2: 375 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Bolus', dose_m2: 425 }],
+    'Carboplatin + Etoposide': [{ name: 'Etoposide', dose_m2: 100 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }],
+    'Carboplatin + 5-Fu': [{ name: '5-FU', dose_m2: 1000 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }],
+    'Cisplatin + 5-Fu': [{ name: '5-FU', dose_m2: 1000 }, { name: 'Cisplatin', dose_m2: 75 }, { name: 'Cisplatin', dose_m2: 100 }],
+    'XELOX': [{ name: 'Oxaliplatin', dose_m2: 130, unit: 'mg', type: 'iv' }, { name: 'Capecitabine(500)', dose_m2: 2000, unit: 'tab', note: '(oral pc เช้า-เย็น 14 วัน)', type: 'capecitabine_special' }],
+    'AC Regimen': [{ name: 'Doxorubicin', dose_m2: 60 }, { name: 'Cyclophosphamide', dose_m2: 600 }],
+    'Paclitaxel (Weekly)': [{ name: 'Paclitaxel', dose_m2: 80 }],
+    'Paclitaxel + Carboplatin': [{ name: 'Paclitaxel', dose_m2: 175 }, { name: 'Paclitaxel', dose_m2: 225 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }],
+    'TIP': [{ name: 'Paclitaxel', dose_m2: 175 }, { name: 'Paclitaxel', dose_m2: 225 }, { name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1500 }, { name: 'Cisplatin', dose_m2: 25 }],
+    'Ifosfamide+Etoposide': [{ name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1500 }, { name: 'Etoposide', dose_m2: 80 }],
+    'BEP': [{ name: 'Cisplatin', dose_m2: 20 }, { name: 'Carboplatin', type: 'auc', target_auc: 6 }, { name: 'Etoposide', dose_m2: 80 }, { name: 'Bleomycin', type: 'fixed', dose_fixed: 30, note: '(Max 30 mg)' }],
+    'VIP': [{ name: 'Cisplatin', dose_m2: 20 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }, { name: 'Etoposide', dose_m2: 75 }, { name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1200 }],
+    'R-CHOP': [{ name: 'Rituximab', dose_m2: 375 }, { name: 'Cyclophosphamide', dose_m2: 750 }, { name: 'Doxorubicin', dose_m2: 50 }, { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 }]
 };
 
 function calculateBSA(h, w) { return Math.sqrt((h * w) / 3600); }
@@ -383,21 +261,27 @@ function calculateChemoDose() {
     if (!protocol) { $('#resultMultiDose').html('<div class="placeholder-text">SELECT REGIMEN</div>'); $('#aucContainer').hide(); return; }
     let drugs = DEFAULT_REGIMENS[protocol]; $('#aucContainer').toggle(drugs.some(d => d.type === 'auc'));
     
-    // เปลี่ยนหัวตารางให้สั้นลงตามคำขอ
     let html = `<table class="result-table"><thead><tr><th>DRUG</th><th>STD</th><th>DOSE</th><th>ADJ</th></tr></thead><tbody>`;
     drugs.forEach(drug => {
         let dose = 0, std = drug.dose_m2 || '-', note = drug.note || '', reducTxt = `${((1-reduction)*100).toFixed(0)}%`;
+        
         if (drug.type === 'capecitabine_special') {
             let total = Math.floor((bsa * drug.dose_m2 * reduction) / 500), eve = Math.floor(total/2), morn = total - eve;
-            // จัดชิดซ้าย
             dose = `<div style="text-align:left;"><b>${morn}-0-${eve}</b><br><small style="font-size:0.65em; opacity:0.7">(${total*14} tab)</small></div>`;
-        } else if (drug.type === 'fixed') { dose = drug.dose_fixed; std = `${drug.dose_fixed} mg`; reducTxt = '0%';
+        } else if (drug.type === 'fixed') { 
+            dose = drug.dose_fixed; std = `${drug.dose_fixed} mg`; reducTxt = '0%';
         } else if (drug.type === 'auc') {
             let auc = parseFloat($('#targetAUC').val()); std = `AUC ${auc}`;
-            if (gfr > 0) dose = (auc * (Math.min(gfr, 125) + 25) * reduction).toFixed(0);
+            // แก้ไขตรงนี้: เอา * reduction ออก
+            if (gfr > 0) dose = (auc * (Math.min(gfr, 125) + 25)).toFixed(0);
             else { dose = '-'; note = '<span class="text-danger">Need Scr</span>'; }
-        } else if (drug.type === 'weight') { dose = (drug.dose_kg * w * reduction).toFixed(0); std = `${drug.dose_kg} mg/kg`;
-        } else { dose = (drug.dose_m2 * bsa * reduction); if(drug.max_dose && dose > drug.max_dose) dose = drug.max_dose; dose = dose.toFixed(0); }
+            // บังคับให้แสดงว่าลด 0% เพราะสูตร AUC ไม่คูณ reduction แล้ว
+            reducTxt = '0%'; 
+        } else if (drug.type === 'weight') { 
+            dose = (drug.dose_kg * w * reduction).toFixed(0); std = `${drug.dose_kg} mg/kg`;
+        } else { 
+            dose = (drug.dose_m2 * bsa * reduction); if(drug.max_dose && dose > drug.max_dose) dose = drug.max_dose; dose = dose.toFixed(0); 
+        }
         
         html += `<tr><td>${drug.name}<br><small style="font-size:0.65em; color:var(--text-muted)">${note}</small></td><td style="color:var(--text-muted)">${std}</td><td class="dose-value">${dose}</td><td>${reducTxt}</td></tr>`;
     });
