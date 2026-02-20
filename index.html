@@ -87,10 +87,25 @@
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #334155; border-radius: 8px;
             font-size: 1rem; color: white;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none; border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
         }
 
         .row-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .row-group > div { flex: 1; }
+
+        .weight-badge {
+            display: flex; justify-content: space-between; 
+            font-size: 0.75rem; color: #94a3b8; 
+            background: rgba(0,0,0,0.3); padding: 8px 12px; 
+            border-radius: 8px; margin-top: -5px; margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .weight-badge b { color: #38bdf8; font-size: 0.85rem; }
 
         .bsa-result {
             margin-top: 10px; background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(0,0,0,0));
@@ -153,8 +168,15 @@
     <div class="card">
         <div class="row-group">
             <div><label>📏 Height (cm)</label><input type="number" id="height" oninput="calculateChemoDose()" placeholder="0"></div>
-            <div><label>⚖️ Weight (kg)</label><input type="number" id="weight" oninput="calculateChemoDose()" placeholder="0"></div>
+            <div><label>⚖️ TBW / Weight (kg)</label><input type="number" id="weight" oninput="calculateChemoDose()" placeholder="0"></div>
         </div>
+        
+        <div class="weight-badge">
+            <span>IBW: <b id="dispIBW">-</b> kg</span>
+            <span>ABW: <b id="dispABW">-</b> kg</span>
+            <span>BMI: <b id="dispBMI">-</b></span>
+        </div>
+
         <div class="row-group">
             <div>
                 <label>⚧ Sex</label>
@@ -165,14 +187,27 @@
             </div>
             <div><label>🎂 Age (Yr)</label><input type="number" id="age" oninput="calculateChemoDose()" placeholder="0"></div>
         </div>
-        <div class="input-group">
-            <label>🧪 Serum Creatinine (mg/dL)</label>
-            <input type="number" id="scr" step="0.01" oninput="calculateChemoDose()" placeholder="For Carboplatin">
-            <div id="gfrDisplay" style="font-size: 0.75rem; color: #4ade80; text-align: left; margin-top: 3px; min-height: 18px;"></div>
+        
+        <div class="row-group">
+            <div>
+                <label>🧪 Serum Cr (mg/dL)</label>
+                <input type="number" id="scr" step="0.01" oninput="calculateChemoDose()" placeholder="For Carboplatin">
+            </div>
+            <div>
+                <label>⚙️ Weight Setting</label>
+                <select id="weightForGFR" onchange="calculateChemoDose()" style="font-size: 0.8rem;">
+                    <option value="tbw" selected>TBW (Actual Weight)</option>
+                    <option value="ibw">IBW (Ideal Weight)</option>
+                    <option value="abw">ABW (Adjusted Weight)</option>
+                </select>
+            </div>
         </div>
+        <div id="gfrDisplay" style="font-size: 0.8rem; color: #4ade80; text-align: left; margin-top: -5px; margin-bottom: 10px; min-height: 18px;"></div>
+        
         <div class="bsa-result">
             <div style="font-size:0.7rem; letter-spacing:1px; color:#fbcfe8;">BODY SURFACE AREA</div>
             <div class="bsa-value" id="resultBSA">0.00 <span style="font-size:0.9rem; opacity:0.7">m²</span></div>
+            <div id="activeWeightDisplay" style="font-size: 0.65rem; color: #cbd5e1; margin-top: 5px; opacity: 0.8;"></div>
         </div>
     </div>
 
@@ -209,16 +244,41 @@
 
     <div class="visitor-counter">
         <a href="https://www.freecounterstat.com"><img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=xa9gdz9egktyd3aud1qybnrpn5zyj3s4" border="0"></a>
-       <br>ผลงานลิขสิทธิ์ทะเบียนเลขที่ ว1.000040 กรมทรัพย์สินทางปัญญา 
-       <br>พัฒนาโดย: พว.วิษณุกรณ์ โอยา (รพ.ชลบุรี)
-       <br>ผู้ตรวจสอบ: นพ.อรรณพ กิตติวราวุฒิ และพญ.ชลิตา ละกำปั่น
+        <br>ผลงานลิขสิทธิ์ทะเบียนเลขที่ ว1.000040 กรมทรัพย์สินทางปัญญา 
+        <br>พัฒนาโดย: พว.วิษณุกรณ์ โอยา (รพ.ชลบุรี)
+        <br>ผู้ตรวจสอบ: นพ.อรรณพ กิตติวราวุฒิ และพญ.ชลิตา ละกำปั่น
     </div>
 </div>
 
 <div class="modal fade" id="handbookModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content"><div class="modal-header"><h5>📘 Handbook</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body text-center"><img src="handbook_CDC.png" class="img-fluid rounded shadow"></div></div>
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title text-info" style="font-weight:600;">📘 คู่มือการใช้งาน (User Manual)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-start">
+                <div class="mb-3 p-3 rounded" style="background: rgba(255,255,255,0.05); border-left: 4px solid var(--neon-blue);">
+                    <h6 class="text-info fw-bold mb-1">1. ระบบเลือกน้ำหนัก (Weight Setting)</h6>
+                    <ul class="small text-light mb-0 ps-3" style="opacity:0.8;">
+                        <li>น้ำหนักที่เลือกในเมนู จะถูกนำไปใช้คำนวณทั้ง <b>CrCl, BSA และ Dose</b></li>
+                        <li><b>TBW (Actual):</b> ใช้น้ำหนักจริงที่ผู้ป่วยชั่งได้ (เป็นค่าเริ่มต้น)</li>
+                        <li><b>IBW (Ideal):</b> ใช้น้ำหนักตัวในเกณฑ์อุดมคติ</li>
+                        <li><b>ABW (Adjusted):</b> ใช้น้ำหนักตัวแบบปรับแก้ สำหรับผู้ป่วยที่มีภาวะอ้วน</li>
+                    </ul>
+                </div>
+
+                <div class="mb-3 p-3 rounded" style="background: rgba(255,255,255,0.05); border-left: 4px solid var(--neon-pink);">
+                    <h6 class="text-danger fw-bold mb-1" style="color: var(--neon-pink) !important;">2. สูตรยา Carboplatin (AUC)</h6>
+                    <ul class="small text-light mb-0 ps-3" style="opacity:0.8;">
+                        <li><b>*สำคัญ:</b> การคำนวณ AUC จะใช้สูตร Calvert Formula โดยตรง (Max GFR 125) และ <u>จะไม่ถูกลดทอน</u> ตาม % Dose Reduction ที่เลือก (ADJ 0% เสมอ)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0 p-2">
+                <button type="button" class="btn btn-secondary w-100 rounded-pill" data-bs-dismiss="modal">ปิดหน้าต่าง</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -245,25 +305,83 @@ const DEFAULT_REGIMENS = {
 };
 
 function calculateBSA(h, w) { return Math.sqrt((h * w) / 3600); }
-function calculateGFR(age, weight, gender, scr) {
-    if(!age || !weight || !scr || scr <= 0) return 0;
-    let gfr = ((140 - age) * weight) / (72 * scr);
+
+function calculateGFR(age, gender, scr, activeWeight) {
+    if(!age || !activeWeight || !scr || scr <= 0) return 0;
+    let gfr = ((140 - age) * activeWeight) / (72 * scr);
     return gender === 'female' ? gfr * 0.85 : gfr;
 }
 
 function calculateChemoDose() {
-    let h = parseFloat($('#height').val()), w = parseFloat($('#weight').val()), age = parseFloat($('#age').val()), scr = parseFloat($('#scr').val());
-    let gender = $('#gender').val(), protocol = $('#drugProtocol').val(), reduction = parseFloat($('#doseReduction').val());
-    let gfr = calculateGFR(age, w, gender, scr), bsa = calculateBSA(h, w);
+    let h = parseFloat($('#height').val()) || 0;
+    let w = parseFloat($('#weight').val()) || 0; // w = TBW
+    let age = parseFloat($('#age').val()) || 0;
+    let scr = parseFloat($('#scr').val()) || 0;
     
-    $('#gfrDisplay').html(gfr > 0 ? `CrCl: <b>${gfr.toFixed(1)}</b>` : '<span style="color:#ec4899;">(รอ Scr)</span>');
-    if (!h || !w) { $('#resultBSA').html('0.00 <small>m²</small>'); $('#resultMultiDose').html('<div class="placeholder-text">WAITING INPUT...</div>'); return; }
-    $('#resultBSA').html(bsa.toFixed(2) + ' <small>m²</small>');
+    let gender = $('#gender').val();
+    let protocol = $('#drugProtocol').val();
+    let reduction = parseFloat($('#doseReduction').val());
+    
+    // --- 1. Calculate IBW, ABW, BMI ---
+    let ibw = 0, abw = 0, bmi = 0;
+    if (h > 0) {
+        let h_inch = h / 2.54;
+        ibw = gender === 'male' ? 50 + 2.3 * Math.max(0, h_inch - 60) : 45.5 + 2.3 * Math.max(0, h_inch - 60);
+        bmi = w / ((h / 100) * (h / 100));
+    }
+    abw = ibw + 0.4 * (w - ibw);
 
-    if (!protocol) { $('#resultMultiDose').html('<div class="placeholder-text">SELECT REGIMEN</div>'); $('#aucContainer').hide(); return; }
-    let drugs = DEFAULT_REGIMENS[protocol]; $('#aucContainer').toggle(drugs.some(d => d.type === 'auc'));
+    $('#dispIBW').text(h > 0 ? ibw.toFixed(1) : '-');
+    $('#dispABW').text(h > 0 && w > 0 ? abw.toFixed(1) : '-');
+    $('#dispBMI').text(h > 0 && w > 0 ? bmi.toFixed(1) : '-');
+
+    // --- 2. Determine Active Weight (Used for GFR, BSA, and mg/kg Drugs) ---
+    let weightMode = $('#weightForGFR').val();
+    let activeWeight = w;
+    let ruleText = "TBW";
+
+    if (weightMode === 'ibw') { 
+        activeWeight = ibw; ruleText = "IBW"; 
+    } else if (weightMode === 'abw') { 
+        activeWeight = abw; ruleText = "ABW"; 
+    } else { 
+        activeWeight = w; ruleText = "TBW"; 
+    }
+
+    // --- 3. Calculate GFR ---
+    let gfr = calculateGFR(age, gender, scr, activeWeight);
+    if (gfr > 0) {
+        $('#gfrDisplay').html(`CrCl: <b>${gfr.toFixed(1)}</b> mL/min`);
+    } else {
+        $('#gfrDisplay').html('<span style="color:#ec4899;">(รอ Age, Wt, Scr)</span>');
+    }
+
+    // --- 4. Render BSA (using activeWeight) ---
+    if (!h || !w) { 
+        $('#resultBSA').html('0.00 <small>m²</small>'); 
+        $('#activeWeightDisplay').html('');
+        $('#resultMultiDose').html('<div class="placeholder-text">WAITING INPUT...</div>'); 
+        return; 
+    }
+    
+    // คำนวณ BSA ใหม่ตามน้ำหนักที่ถูกเลือก
+    let bsa = calculateBSA(h, activeWeight);
+    $('#resultBSA').html(bsa.toFixed(2) + ' <small>m²</small>');
+    // แสดงข้อความให้รู้ว่าใช้น้ำหนักไหน
+    $('#activeWeightDisplay').html(`(Calculation based on <b>${ruleText}: ${activeWeight.toFixed(1)} kg</b>)`);
+
+    // --- 5. Dose Calculation ---
+    if (!protocol) { 
+        $('#resultMultiDose').html('<div class="placeholder-text">SELECT REGIMEN</div>'); 
+        $('#aucContainer').hide(); 
+        return; 
+    }
+    
+    let drugs = DEFAULT_REGIMENS[protocol]; 
+    $('#aucContainer').toggle(drugs.some(d => d.type === 'auc'));
     
     let html = `<table class="result-table"><thead><tr><th>DRUG</th><th>STD</th><th>DOSE</th><th>ADJ</th></tr></thead><tbody>`;
+    
     drugs.forEach(drug => {
         let dose = 0, std = drug.dose_m2 || '-', note = drug.note || '', reducTxt = `${((1-reduction)*100).toFixed(0)}%`;
         
@@ -274,19 +392,20 @@ function calculateChemoDose() {
             dose = drug.dose_fixed; std = `${drug.dose_fixed} mg`; reducTxt = '0%';
         } else if (drug.type === 'auc') {
             let auc = parseFloat($('#targetAUC').val()); std = `AUC ${auc}`;
-            // แก้ไขตรงนี้: เอา * reduction ออก
             if (gfr > 0) dose = (auc * (Math.min(gfr, 125) + 25)).toFixed(0);
             else { dose = '-'; note = '<span class="text-danger">Need Scr</span>'; }
-            // บังคับให้แสดงว่าลด 0% เพราะสูตร AUC ไม่คูณ reduction แล้ว
             reducTxt = '0%'; 
         } else if (drug.type === 'weight') { 
-            dose = (drug.dose_kg * w * reduction).toFixed(0); std = `${drug.dose_kg} mg/kg`;
+            // ยาที่คิดตามน้ำหนัก (เช่น Avastin) ก็จะใช้น้ำหนักที่ถูกเลือก (activeWeight) ด้วย
+            dose = (drug.dose_kg * activeWeight * reduction).toFixed(0); std = `${drug.dose_kg} mg/kg`;
         } else { 
+            // ยาที่คิดตาม BSA ก็จะใช้ BSA ใหม่ที่ปรับแล้ว
             dose = (drug.dose_m2 * bsa * reduction); if(drug.max_dose && dose > drug.max_dose) dose = drug.max_dose; dose = dose.toFixed(0); 
         }
         
         html += `<tr><td>${drug.name}<br><small style="font-size:0.65em; color:var(--text-muted)">${note}</small></td><td style="color:var(--text-muted)">${std}</td><td class="dose-value">${dose}</td><td>${reducTxt}</td></tr>`;
     });
+    
     $('#resultMultiDose').html(html + '</tbody></table>');
 }
 
