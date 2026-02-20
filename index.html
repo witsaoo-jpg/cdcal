@@ -134,14 +134,28 @@
         }
         .result-table td {
             padding: 8px 4px; text-align: left; font-size: 0.8rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: top;
+            border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle;
         }
-        .result-table tr td:first-child { font-weight: 600; color: white; width: 40%; }
+        .result-table tr td:first-child { font-weight: 600; color: white; width: 35%; }
         .dose-value { 
             color: var(--neon-blue); font-weight: 700; font-size: 0.95rem; 
             text-shadow: 0 0 5px rgba(6, 182, 212, 0.3); text-align: left !important; white-space: nowrap; 
         }
-        .result-table tr td:last-child { color: var(--neon-pink); font-size: 0.75rem; }
+        
+        /* สไตล์สำหรับ Dropdown ปรับลดโดสรายตัว */
+        .adj-select {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+            border-radius: 6px;
+            padding: 3px 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            outline: none;
+            width: 100%;
+            font-weight: 600;
+        }
+        .adj-select option { background: #0f172a; color: white; }
 
         .handbook-btn {
             background: rgba(6, 182, 212, 0.1); border: 1px dashed var(--neon-blue);
@@ -226,12 +240,15 @@
             </select>
         </div>
         <div class="input-group">
-            <label>📉 Dose Adjustment</label>
+            <label>📉 Global Dose Adj. (ลดทุกตัว)</label>
             <select id="doseReduction" onchange="calculateChemoDose()">
                 <option value="1">Standard (100%)</option>
-                <option value="0.95">Reduce 5%</option><option value="0.90">Reduce 10%</option>
-                <option value="0.85">Reduce 15%</option><option value="0.80">Reduce 20%</option>
-                <option value="0.75">Reduce 25%</option><option value="0.70">Reduce 30%</option>
+                <option value="0.95">Reduce 5% (เหลือ 95%)</option>
+                <option value="0.90">Reduce 10% (เหลือ 90%)</option>
+                <option value="0.85">Reduce 15% (เหลือ 85%)</option>
+                <option value="0.80">Reduce 20% (เหลือ 80%)</option>
+                <option value="0.75">Reduce 25% (เหลือ 75%)</option>
+                <option value="0.70">Reduce 30% (เหลือ 70%)</option>
             </select>
         </div>
         <button class="calculate-button" onclick="calculateChemoDose()">CALCULATE</button>
@@ -269,9 +286,11 @@
                 </div>
 
                 <div class="mb-3 p-3 rounded" style="background: rgba(255,255,255,0.05); border-left: 4px solid var(--neon-pink);">
-                    <h6 class="text-danger fw-bold mb-1" style="color: var(--neon-pink) !important;">2. สูตรยา Carboplatin (AUC)</h6>
+                    <h6 class="text-danger fw-bold mb-1" style="color: var(--neon-pink) !important;">2. การปรับลดโดสยา (Dose Adjustment)</h6>
                     <ul class="small text-light mb-0 ps-3" style="opacity:0.8;">
-                        <li><b>*สำคัญ:</b> การคำนวณ AUC จะใช้สูตร Calvert Formula โดยตรง (Max GFR 125) และ <u>จะไม่ถูกลดทอน</u> ตาม % Dose Reduction ที่เลือก (ADJ 0% เสมอ)</li>
+                        <li><b>ลดทุกตัว (Global):</b> ปรับจากเมนูด้านบน ยาทุกตัวจะถูกปรับลดพร้อมกัน</li>
+                        <li><b>ลดแยกตัว (Individual):</b> สามารถเลือกลด % เฉพาะยาบางตัวได้จาก <u>ช่อง ADJ ในตารางผลลัพธ์</u></li>
+                        <li><b>*สูตร AUC/Fixed:</b> จะไม่สามารถลดโดสได้ (ขึ้นคำว่า FIX เสมอ)</li>
                     </ul>
                 </div>
             </div>
@@ -304,12 +323,23 @@ const DEFAULT_REGIMENS = {
     'R-CHOP': [{ name: 'Rituximab', dose_m2: 375 }, { name: 'Cyclophosphamide', dose_m2: 750 }, { name: 'Doxorubicin', dose_m2: 50 }, { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 }]
 };
 
+// ตัวแปรเก็บสถานะการทำงาน
+let lastProtocol = '';
+let lastGlobalReduction = 1;
+window.individualReductions = [];
+
 function calculateBSA(h, w) { return Math.sqrt((h * w) / 3600); }
 
 function calculateGFR(age, gender, scr, activeWeight) {
     if(!age || !activeWeight || !scr || scr <= 0) return 0;
     let gfr = ((140 - age) * activeWeight) / (72 * scr);
     return gender === 'female' ? gfr * 0.85 : gfr;
+}
+
+// อัปเดต % เมื่อเลือกจาก Dropdown ในตาราง
+function updateSingleDose(index, val) {
+    window.individualReductions[index] = parseFloat(val);
+    calculateChemoDose(); 
 }
 
 function calculateChemoDose() {
@@ -320,8 +350,18 @@ function calculateChemoDose() {
     
     let gender = $('#gender').val();
     let protocol = $('#drugProtocol').val();
-    let reduction = parseFloat($('#doseReduction').val());
+    let globalReduc = parseFloat($('#doseReduction').val());
     
+    // รีเซ็ตค่า Individual Reductions เมื่อเปลี่ยนสูตรยา หรือ เปลี่ยน Global Adjustment
+    if (protocol !== lastProtocol || globalReduc !== lastGlobalReduction) {
+        lastProtocol = protocol;
+        lastGlobalReduction = globalReduc;
+        if (DEFAULT_REGIMENS[protocol]) {
+            // ตั้งค่า Array ให้ทุกตัวยามี % ตาม Global Dropdown
+            window.individualReductions = DEFAULT_REGIMENS[protocol].map(() => globalReduc);
+        }
+    }
+
     // --- 1. Calculate IBW, ABW, BMI ---
     let ibw = 0, abw = 0, bmi = 0;
     if (h > 0) {
@@ -335,7 +375,7 @@ function calculateChemoDose() {
     $('#dispABW').text(h > 0 && w > 0 ? abw.toFixed(1) : '-');
     $('#dispBMI').text(h > 0 && w > 0 ? bmi.toFixed(1) : '-');
 
-    // --- 2. Determine Active Weight (Used for GFR, BSA, and mg/kg Drugs) ---
+    // --- 2. Determine Active Weight ---
     let weightMode = $('#weightForGFR').val();
     let activeWeight = w;
     let ruleText = "TBW";
@@ -356,7 +396,7 @@ function calculateChemoDose() {
         $('#gfrDisplay').html('<span style="color:#ec4899;">(รอ Age, Wt, Scr)</span>');
     }
 
-    // --- 4. Render BSA (using activeWeight) ---
+    // --- 4. Render BSA ---
     if (!h || !w) { 
         $('#resultBSA').html('0.00 <small>m²</small>'); 
         $('#activeWeightDisplay').html('');
@@ -364,10 +404,8 @@ function calculateChemoDose() {
         return; 
     }
     
-    // คำนวณ BSA ใหม่ตามน้ำหนักที่ถูกเลือก
     let bsa = calculateBSA(h, activeWeight);
     $('#resultBSA').html(bsa.toFixed(2) + ' <small>m²</small>');
-    // แสดงข้อความให้รู้ว่าใช้น้ำหนักไหน
     $('#activeWeightDisplay').html(`(Calculation based on <b>${ruleText}: ${activeWeight.toFixed(1)} kg</b>)`);
 
     // --- 5. Dose Calculation ---
@@ -382,28 +420,52 @@ function calculateChemoDose() {
     
     let html = `<table class="result-table"><thead><tr><th>DRUG</th><th>STD</th><th>DOSE</th><th>ADJ</th></tr></thead><tbody>`;
     
-    drugs.forEach(drug => {
-        let dose = 0, std = drug.dose_m2 || '-', note = drug.note || '', reducTxt = `${((1-reduction)*100).toFixed(0)}%`;
+    // สร้างตารางพร้อม Dropdown ย่อยสำหรับยาแต่ละตัว
+    drugs.forEach((drug, index) => {
+        let dose = 0, std = drug.dose_m2 || '-', note = drug.note || '';
+        let currentReduc = window.individualReductions[index]; 
+        let reducText = '';
+
+        // สร้าง HTML สำหรับ Dropdown ปรับรายตัว
+        let adjOptions = [1, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70].map(val => {
+            let sel = Math.abs(val - currentReduc) < 0.01 ? 'selected' : '';
+            return `<option value="${val}" ${sel}>${Math.round(val*100)}%</option>`;
+        }).join('');
+        let selectHtml = `<select class="adj-select" onchange="updateSingleDose(${index}, this.value)">${adjOptions}</select>`;
         
+        // แยกคำนวณตามชนิดของยา
         if (drug.type === 'capecitabine_special') {
-            let total = Math.floor((bsa * drug.dose_m2 * reduction) / 500), eve = Math.floor(total/2), morn = total - eve;
+            let total = Math.floor((bsa * drug.dose_m2 * currentReduc) / 500), eve = Math.floor(total/2), morn = total - eve;
             dose = `<div style="text-align:left;"><b>${morn}-0-${eve}</b><br><small style="font-size:0.65em; opacity:0.7">(${total*14} tab)</small></div>`;
+            reducText = selectHtml;
+            
         } else if (drug.type === 'fixed') { 
-            dose = drug.dose_fixed; std = `${drug.dose_fixed} mg`; reducTxt = '0%';
+            dose = drug.dose_fixed; std = `${drug.dose_fixed} mg`; 
+            reducText = '<span style="color:#94a3b8; font-size:0.7rem;">FIX</span>';
+            
         } else if (drug.type === 'auc') {
             let auc = parseFloat($('#targetAUC').val()); std = `AUC ${auc}`;
             if (gfr > 0) dose = (auc * (Math.min(gfr, 125) + 25)).toFixed(0);
             else { dose = '-'; note = '<span class="text-danger">Need Scr</span>'; }
-            reducTxt = '0%'; 
+            reducText = '<span style="color:#94a3b8; font-size:0.7rem;">FIX</span>'; 
+            
         } else if (drug.type === 'weight') { 
-            // ยาที่คิดตามน้ำหนัก (เช่น Avastin) ก็จะใช้น้ำหนักที่ถูกเลือก (activeWeight) ด้วย
-            dose = (drug.dose_kg * activeWeight * reduction).toFixed(0); std = `${drug.dose_kg} mg/kg`;
+            dose = (drug.dose_kg * activeWeight * currentReduc).toFixed(0); std = `${drug.dose_kg} mg/kg`;
+            reducText = selectHtml;
+            
         } else { 
-            // ยาที่คิดตาม BSA ก็จะใช้ BSA ใหม่ที่ปรับแล้ว
-            dose = (drug.dose_m2 * bsa * reduction); if(drug.max_dose && dose > drug.max_dose) dose = drug.max_dose; dose = dose.toFixed(0); 
+            dose = (drug.dose_m2 * bsa * currentReduc); 
+            if(drug.max_dose && dose > drug.max_dose) dose = drug.max_dose; 
+            dose = dose.toFixed(0); 
+            reducText = selectHtml;
         }
         
-        html += `<tr><td>${drug.name}<br><small style="font-size:0.65em; color:var(--text-muted)">${note}</small></td><td style="color:var(--text-muted)">${std}</td><td class="dose-value">${dose}</td><td>${reducTxt}</td></tr>`;
+        html += `<tr>
+            <td>${drug.name}<br><small style="font-size:0.65em; color:var(--text-muted)">${note}</small></td>
+            <td style="color:var(--text-muted)">${std}</td>
+            <td class="dose-value">${dose}</td>
+            <td>${reducText}</td>
+        </tr>`;
     });
     
     $('#resultMultiDose').html(html + '</tbody></table>');
