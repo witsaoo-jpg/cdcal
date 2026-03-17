@@ -142,7 +142,6 @@
             text-shadow: 0 0 5px rgba(6, 182, 212, 0.3); text-align: left !important; white-space: nowrap; 
         }
         
-        /* สไตล์สำหรับ Dropdown ปรับลดโดสรายตัว */
         .adj-select {
             background: rgba(15, 23, 42, 0.8);
             border: 1px solid var(--neon-pink);
@@ -280,8 +279,8 @@
                     <ul class="small text-light mb-0 ps-3" style="opacity:0.8;">
                         <li>น้ำหนักที่เลือกในเมนู จะถูกนำไปใช้คำนวณทั้ง <b>CrCl, BSA และ Dose</b></li>
                         <li><b>TBW (Actual):</b> ใช้น้ำหนักจริงที่ผู้ป่วยชั่งได้ (เป็นค่าเริ่มต้น)</li>
-                        <li><b>IBW (Ideal):</b> ใช้น้ำหนักตัวในเกณฑ์อุดมคติ</li>
-                        <li><b>ABW (Adjusted):</b> ใช้น้ำหนักตัวแบบปรับแก้ สำหรับผู้ป่วยที่มีภาวะอ้วน</li>
+                        <li><b>IBW (Ideal):</b> คำนวณตาม Devine Formula (ใช้ความสูง > 60 นิ้ว)</li>
+                        <li><b>ABW (Adjusted):</b> คิดเฉพาะเมื่อน้ำหนักจริงมากกว่า IBW (Obese)</li>
                     </ul>
                 </div>
 
@@ -323,7 +322,6 @@ const DEFAULT_REGIMENS = {
     'R-CHOP': [{ name: 'Rituximab', dose_m2: 375 }, { name: 'Cyclophosphamide', dose_m2: 750 }, { name: 'Doxorubicin', dose_m2: 50 }, { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 }]
 };
 
-// ตัวแปรเก็บสถานะการทำงาน
 let lastProtocol = '';
 let lastGlobalReduction = 1;
 window.individualReductions = [];
@@ -336,7 +334,6 @@ function calculateGFR(age, gender, scr, activeWeight) {
     return gender === 'female' ? gfr * 0.85 : gfr;
 }
 
-// อัปเดต % เมื่อเลือกจาก Dropdown ในตาราง
 function updateSingleDose(index, val) {
     window.individualReductions[index] = parseFloat(val);
     calculateChemoDose(); 
@@ -344,7 +341,7 @@ function updateSingleDose(index, val) {
 
 function calculateChemoDose() {
     let h = parseFloat($('#height').val()) || 0;
-    let w = parseFloat($('#weight').val()) || 0; // w = TBW
+    let w = parseFloat($('#weight').val()) || 0; 
     let age = parseFloat($('#age').val()) || 0;
     let scr = parseFloat($('#scr').val()) || 0;
     
@@ -352,28 +349,40 @@ function calculateChemoDose() {
     let protocol = $('#drugProtocol').val();
     let globalReduc = parseFloat($('#doseReduction').val());
     
-    // รีเซ็ตค่า Individual Reductions เมื่อเปลี่ยนสูตรยา หรือ เปลี่ยน Global Adjustment
     if (protocol !== lastProtocol || globalReduc !== lastGlobalReduction) {
         lastProtocol = protocol;
         lastGlobalReduction = globalReduc;
         if (DEFAULT_REGIMENS[protocol]) {
-            // ตั้งค่า Array ให้ทุกตัวยามี % ตาม Global Dropdown
             window.individualReductions = DEFAULT_REGIMENS[protocol].map(() => globalReduc);
         }
     }
 
-    // --- 1. Calculate IBW, ABW, BMI ---
+    // --- 1. Calculate IBW, ABW, BMI based on Devine Formula ---
     let ibw = 0, abw = 0, bmi = 0;
     if (h > 0) {
         let h_inch = h / 2.54;
-        ibw = gender === 'male' ? 50 + 2.3 * Math.max(0, h_inch - 60) : 45.5 + 2.3 * Math.max(0, h_inch - 60);
+        let inch_over_60 = h_inch > 60 ? (h_inch - 60) : 0; 
+        
+        if (gender === 'male') {
+            ibw = 50 + (2.3 * inch_over_60);
+        } else {
+            ibw = 45.5 + (2.3 * inch_over_60);
+        }
+        
         bmi = w / ((h / 100) * (h / 100));
     }
-    abw = ibw + 0.4 * (w - ibw);
+    
+    // ABW is for obese patients (Actual BW > IBW)
+    if (w > ibw && ibw > 0) {
+        abw = ibw + 0.4 * (w - ibw);
+    } else {
+        abw = w; 
+    }
 
-    $('#dispIBW').text(h > 0 ? ibw.toFixed(1) : '-');
-    $('#dispABW').text(h > 0 && w > 0 ? abw.toFixed(1) : '-');
-    $('#dispBMI').text(h > 0 && w > 0 ? bmi.toFixed(1) : '-');
+    // เปลี่ยนจาก .toFixed(1) เป็น .toFixed(2)
+    $('#dispIBW').text(h > 0 ? ibw.toFixed(2) : '-');
+    $('#dispABW').text(h > 0 && w > 0 ? abw.toFixed(2) : '-');
+    $('#dispBMI').text(h > 0 && w > 0 ? bmi.toFixed(2) : '-');
 
     // --- 2. Determine Active Weight ---
     let weightMode = $('#weightForGFR').val();
@@ -406,7 +415,9 @@ function calculateChemoDose() {
     
     let bsa = calculateBSA(h, activeWeight);
     $('#resultBSA').html(bsa.toFixed(2) + ' <small>m²</small>');
-    $('#activeWeightDisplay').html(`(Calculation based on <b>${ruleText}: ${activeWeight.toFixed(1)} kg</b>)`);
+    
+    // เปลี่ยนน้ำหนักอ้างอิงเป็นทศนิยม 2 ตำแหน่ง
+    $('#activeWeightDisplay').html(`(Calculation based on <b>${ruleText}: ${activeWeight.toFixed(2)} kg</b>)`);
 
     // --- 5. Dose Calculation ---
     if (!protocol) { 
@@ -420,20 +431,17 @@ function calculateChemoDose() {
     
     let html = `<table class="result-table"><thead><tr><th>DRUG</th><th>STD</th><th>DOSE</th><th>ADJ</th></tr></thead><tbody>`;
     
-    // สร้างตารางพร้อม Dropdown ย่อยสำหรับยาแต่ละตัว
     drugs.forEach((drug, index) => {
         let dose = 0, std = drug.dose_m2 || '-', note = drug.note || '';
         let currentReduc = window.individualReductions[index]; 
         let reducText = '';
 
-        // สร้าง HTML สำหรับ Dropdown ปรับรายตัว
         let adjOptions = [1, 0.95, 0.90, 0.85, 0.80, 0.75, 0.70].map(val => {
             let sel = Math.abs(val - currentReduc) < 0.01 ? 'selected' : '';
             return `<option value="${val}" ${sel}>${Math.round(val*100)}%</option>`;
         }).join('');
         let selectHtml = `<select class="adj-select" onchange="updateSingleDose(${index}, this.value)">${adjOptions}</select>`;
         
-        // แยกคำนวณตามชนิดของยา
         if (drug.type === 'capecitabine_special') {
             let total = Math.floor((bsa * drug.dose_m2 * currentReduc) / 500), eve = Math.floor(total/2), morn = total - eve;
             dose = `<div style="text-align:left;"><b>${morn}-0-${eve}</b><br><small style="font-size:0.65em; opacity:0.7">(${total*14} tab)</small></div>`;
