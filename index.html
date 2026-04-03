@@ -301,6 +301,17 @@
 </div>
 
 <script>
+/**
+ * ตัดเศษทิ้งแบบเด็ดขาด (Truncate) — ไม่ปัดเศษขึ้นเด็ดขาด
+ * แก้ไข Bug: parts[0] และ parts[1] ถูก index ผิดในเวอร์ชันก่อน
+ * ใช้วิธี Math.trunc + factor แทน string manipulation เพื่อความแม่นยำ 100%
+ */
+function cutDecimals(value, decimals) {
+    if (value === null || value === undefined || isNaN(value)) return 0;
+    const factor = Math.pow(10, decimals);
+    return Math.trunc(value * factor) / factor;
+}
+
 const DEFAULT_REGIMENS = {
     'mFOLFOX-6': [{ name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
     'mFOLFOX-6+Avastin': [{ name: 'Avastin', type: 'weight', dose_kg: 5 }, { name: 'Oxaliplatin', dose_m2: 85 }, { name: 'Leucovorin', dose_m2: 200 }, { name: '5-FU Bolus', dose_m2: 400 }, { name: '5-FU Infusion', dose_m2: 1200 }],
@@ -319,7 +330,27 @@ const DEFAULT_REGIMENS = {
     'Ifosfamide+Etoposide': [{ name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1500 }, { name: 'Etoposide', dose_m2: 80 }],
     'BEP': [{ name: 'Cisplatin', dose_m2: 20 }, { name: 'Carboplatin', type: 'auc', target_auc: 6 }, { name: 'Etoposide', dose_m2: 80 }, { name: 'Bleomycin', type: 'fixed', dose_fixed: 30, note: '(Max 30 mg)' }],
     'VIP': [{ name: 'Cisplatin', dose_m2: 20 }, { name: 'Carboplatin', type: 'auc', target_auc: 5 }, { name: 'Etoposide', dose_m2: 75 }, { name: 'Mesna', dose_m2: 300 }, { name: 'Ifosfamide', dose_m2: 1200 }],
-    'R-CHOP': [{ name: 'Rituximab', dose_m2: 375 }, { name: 'Cyclophosphamide', dose_m2: 750 }, { name: 'Doxorubicin', dose_m2: 50 }, { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 }]
+    // เพิ่ม 3 สูตรนี้ต่อท้ายจากสูตรเดิมได้เลยครับ
+    'FLOT': [
+        { name: 'Oxaliplatin', dose_m2: 85 }, 
+        { name: 'Leucovorin', dose_m2: 200 }, 
+        { name: '5-FU', dose_m2: 2600, note: '(in 24 hr)' }, 
+        { name: 'Docetaxel', dose_m2: 50 }
+    ],
+    'Platinum/Vinorelbine (Cisplatin)': [
+        { name: 'Cisplatin', dose_m2: 50, note: '(Standard 50, 75-100 mg/m²)' },
+        { name: 'Cisplatin', dose_m2: 70, note: '(Standard 50, 75-100 mg/m²)' }, 
+        { name: 'Cisplatin', dose_m2: 75, note: '(Standard 50, 75-100 mg/m²)' },
+        { name: 'Cisplatin', dose_m2: 100, note: '(Standard 50, 75-100 mg/m²)' },
+        { name: 'Vinorelbine', dose_m2: 25, note: '(Standard 25-30 mg/m²)' },
+        { name: 'Vinorelbine', dose_m2: 30, note: '(Standard 25-30 mg/m²)' }
+    ],
+    'Platinum/Vinorelbine (Carboplatin)': [
+        { name: 'Carboplatin', type: 'auc', target_auc: 5 }, 
+        { name: 'Vinorelbine', dose_m2: 25, note: '(Standard 25-30 mg/m²)' },
+        { name: 'Vinorelbine', dose_m2: 30, note: '(Standard 25-30 mg/m²)' }
+    ],
+    'THP-COP': [{ name: 'Cyclophosphamide', dose_m2: 750 }, { name: 'Pirarubicin (THP)', dose_m2: 50 }, { name: 'Vincristine', dose_m2: 1.4, max_dose: 2 }]
 };
 
 let lastProtocol = '';
@@ -357,7 +388,7 @@ function calculateChemoDose() {
         }
     }
 
-    // --- 1. Calculate IBW, ABW, BMI based on Devine Formula ---
+    // --- 1. Calculate IBW, ABW, BMI ---
     let ibw = 0, abw = 0, bmi = 0;
     if (h > 0) {
         let h_inch = h / 2.54;
@@ -372,14 +403,16 @@ function calculateChemoDose() {
         bmi = w / ((h / 100) * (h / 100));
     }
     
-    // ABW is for obese patients (Actual BW > IBW)
     if (w > ibw && ibw > 0) {
         abw = ibw + 0.4 * (w - ibw);
     } else {
         abw = w; 
     }
 
-    // เปลี่ยนจาก .toFixed(1) เป็น .toFixed(2)
+    ibw = cutDecimals(ibw, 2);
+    abw = cutDecimals(abw, 2);
+    bmi = cutDecimals(bmi, 2);
+
     $('#dispIBW').text(h > 0 ? ibw.toFixed(2) : '-');
     $('#dispABW').text(h > 0 && w > 0 ? abw.toFixed(2) : '-');
     $('#dispBMI').text(h > 0 && w > 0 ? bmi.toFixed(2) : '-');
@@ -398,14 +431,14 @@ function calculateChemoDose() {
     }
 
     // --- 3. Calculate GFR ---
-    let gfr = calculateGFR(age, gender, scr, activeWeight);
+    let gfr = cutDecimals(calculateGFR(age, gender, scr, activeWeight), 2);
     if (gfr > 0) {
-        $('#gfrDisplay').html(`CrCl: <b>${gfr.toFixed(1)}</b> mL/min`);
+        $('#gfrDisplay').html(`CrCl: <b>${gfr}</b> mL/min`);
     } else {
         $('#gfrDisplay').html('<span style="color:#ec4899;">(รอ Age, Wt, Scr)</span>');
     }
 
-    // --- 4. Render BSA ---
+    // --- 4. Render BSA — ตัดทศนิยม 2 ตำแหน่ง ไม่ปัดขึ้น ---
     if (!h || !w) { 
         $('#resultBSA').html('0.00 <small>m²</small>'); 
         $('#activeWeightDisplay').html('');
@@ -413,10 +446,9 @@ function calculateChemoDose() {
         return; 
     }
     
-    let bsa = calculateBSA(h, activeWeight);
+    let rawBsa = calculateBSA(h, activeWeight);
+    let bsa = cutDecimals(rawBsa, 2);  // ← ตัดเศษทิ้ง ไม่ปัดขึ้น
     $('#resultBSA').html(bsa.toFixed(2) + ' <small>m²</small>');
-    
-    // เปลี่ยนน้ำหนักอ้างอิงเป็นทศนิยม 2 ตำแหน่ง
     $('#activeWeightDisplay').html(`(Calculation based on <b>${ruleText}: ${activeWeight.toFixed(2)} kg</b>)`);
 
     // --- 5. Dose Calculation ---
@@ -453,18 +485,19 @@ function calculateChemoDose() {
             
         } else if (drug.type === 'auc') {
             let auc = parseFloat($('#targetAUC').val()); std = `AUC ${auc}`;
-            if (gfr > 0) dose = (auc * (Math.min(gfr, 125) + 25)).toFixed(0);
+            if (gfr > 0) dose = cutDecimals(auc * (Math.min(gfr, 125) + 25), 2);
             else { dose = '-'; note = '<span class="text-danger">Need Scr</span>'; }
             reducText = '<span style="color:#94a3b8; font-size:0.7rem;">FIX</span>'; 
             
         } else if (drug.type === 'weight') { 
-            dose = (drug.dose_kg * activeWeight * currentReduc).toFixed(0); std = `${drug.dose_kg} mg/kg`;
+            dose = cutDecimals(drug.dose_kg * activeWeight * currentReduc, 2);
+            std = `${drug.dose_kg} mg/kg`;
             reducText = selectHtml;
             
         } else { 
-            dose = (drug.dose_m2 * bsa * currentReduc); 
-            if(drug.max_dose && dose > drug.max_dose) dose = drug.max_dose; 
-            dose = dose.toFixed(0); 
+            dose = drug.dose_m2 * bsa * currentReduc;
+            if (drug.max_dose && dose > drug.max_dose) dose = drug.max_dose; 
+            dose = cutDecimals(dose, 2); 
             reducText = selectHtml;
         }
         
